@@ -4,6 +4,7 @@ import presetTypography from "https://esm.sh/@unocss/preset-typography@0.57.7";
 import { createGenerator } from "https://esm.sh/@unocss/core@0.57.7";
 
 const uno = createGenerator({
+  dark: "class",
   theme: {},
   presets: [presetUno(), presetWind(), presetTypography()],
 });
@@ -16,3 +17,5 @@ const { css } = await uno.generate(container, {
 });
 
 style.innerHTML = css;
+
+document.body.removeAttribute("uncloak");

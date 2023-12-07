@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/barelyhuman/go/env"
@@ -44,6 +45,7 @@ func main() {
 
 	var linkList []LinkGroup
 	json.Unmarshal(fileBuff, &linkList)
+	sort.Sort(ByTitle(linkList))
 
 	templateBuff, err := sourceData.ReadFile("index.html")
 	bail(err)
@@ -75,3 +77,9 @@ func (app *App) configure() {
 	port := env.Get("PORT", "3000")
 	app.Port = ":" + port
 }
+
+type ByTitle []LinkGroup
+
+func (a ByTitle) Len() int           { return len(a) }
+func (a ByTitle) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByTitle) Less(i, j int) bool { return a[i].Title < a[j].Title }
