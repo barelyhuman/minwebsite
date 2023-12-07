@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+PROJECT_DIR="${SCRIPT_DIR}/.."
+
+cd $PROJECT_DIR
+. .env
+
+APP_DIR="/apps/minweb"
+APP_BIN="./bin/minweb"
+APP_NAME="minweb"
+
+COMMANDS="""
+mkdir -p ${APP_DIR}
+cd ${APP_DIR}
+go mod tidy 
+go build -o ${APP_BIN} .
+. ~/.nvm/nvm.sh
+pm2 stop ${APP_NAME}
+pm2 start "${APP_BIN}" --name=${APP_NAME}
+"""
+
+rsync -aP --exclude=".git" --exclude=".env" ./ "${DEPLOY_HOST}:${APP_DIR}"
+
+ssh "${DEPLOY_HOST}" "/bin/bash -c '$COMMANDS'"

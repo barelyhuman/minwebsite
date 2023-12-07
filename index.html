@@ -17,10 +17,15 @@
     <div
       class="min-h-[100vh] flex flex-col items-center justify-center p-3 prose prose-zinc"
     >
-      <div>
-        <h1 class="inline-block">Coming soon...</h1>
-      </div>
+      <h3>Minimal Websites</h3>
+      <ul>
+        {{ range .Links }}
+        <li>
+          <a href="{{.Link}}"> {{ .Title }} </a>
+        </li>
+        {{ end}}
+      </ul>
     </div>
-    <script src="/uno.js" type="module" async defer></script>
+    <script src="/assets/uno.js" type="module" async defer></script>
   </body>
 </html>

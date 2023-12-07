@@ -1,0 +1,3 @@
+/minwebsite
+.env*
+!.env.example
