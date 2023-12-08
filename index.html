@@ -19,68 +19,37 @@
   </head>
   <body
     uncloak
-    class="m-0 md:p-0 sm:p-2 max-w-3xl mx-auto dark:bg-zinc-900 dark:text-zinc-600"
+    class="px-2 mx-auto max-w-5xl dark:bg-zinc-900 dark:text-zinc-400"
   >
-    <div
-      class="min-h-[100vh] flex flex-col justify-center prose prose-zinc dark:prose-invert"
-    >
-      <h3>Minimal Websites</h3>
-      <ul>
+    <div class="min-h-[100vh] flex flex-col justify-center w-full">
+      <h3 class="p-1">MW</h3>
+      <div class="grid grid-cols-3 gap-2">
         {{ range .Links }}
-        <li>
-          <a href="{{.Link}}"> {{ .Title }} </a>
-        </li>
-        {{ end}}
-      </ul>
+        <preview-link
+          class="border-box hover:border cursor-pointer hover:border-zinc-100 dark:hover:border-zinc-900 overflow-hidden rounded-sm hover:scale-105 transition-transform"
+          href="{{.Link}}"
+          title="{{.Title}}"
+        >
+        </preview-link>
+        {{end}}
+      </div>
     </div>
     <footer class="text-zinc-400 mb-2">
-      Curated by <a class="underline text-zinc-400 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-zinc-50" href="https://reaper.is">reaper</a> and
-      <a class="underline text-zinc-400 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-zinc-50" href="https://www.wiesson.dev">Arne Wiese</a>
+      Curated by
+      <a
+        class="underline text-zinc-400 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-zinc-50"
+        href="https://reaper.is"
+        >reaper</a
+      >
+      and
+      <a
+        class="underline text-zinc-400 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-zinc-50"
+        href="https://www.wiesson.dev"
+        >Arne Wiese</a
+      >
     </footer>
-    <script type="module">
-      listenToSystemTheme();
-
-      function enableDarkMode() {
-        document.documentElement.classList.add("dark");
-      }
-      function disableDarkMode() {
-        document.documentElement.classList.remove("dark");
-      }
-
-      function getSystemThemePref() {
-        return (
-          window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)")
-        );
-      }
-
-      function listenToSystemTheme() {
-        getSystemThemePref().addEventListener("change", (e) => {
-          if (!e.matches) {
-            disableDarkMode();
-            return;
-          }
-
-          enableDarkMode();
-          return;
-        });
-      }
-
-      function getSystemTheme() {
-        const preference = getSystemThemePref();
-        if (preference.matches) {
-          return "dark";
-        } else {
-          return "light";
-        }
-      }
-
-      const currTheme = getSystemTheme();
-      if (currTheme === "dark") {
-        enableDarkMode();
-      } else {
-        disableDarkMode();
-      }
-    </script>
+    <script src="/assets/elements.js" type="module" async defer></script>
+    <script src="/assets/themer.js" type="module" async defer></script>
     <script src="/assets/uno.js" type="module" async defer></script>
   </body>
 </html>

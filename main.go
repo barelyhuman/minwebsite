@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 	"sort"
 	"strings"
@@ -59,6 +60,20 @@ func main() {
 		if r.Method == "GET" && strings.HasPrefix(r.URL.Path, "/assets") {
 			staticServe.ServeHTTP(w, r)
 			return
+		}
+
+		query := r.URL.Query()
+		linkFetch := query.Get("link")
+		if len(linkFetch) > 0 {
+			resp, err := http.Get(linkFetch)
+			if err != nil {
+				return
+			}
+			responseBody, err := (io.ReadAll(resp.Body))
+			if err != nil {
+				return
+			}
+			w.Write(responseBody)
 		}
 
 		tmpl.Execute(w, RenderResponse{
