@@ -3,17 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>minimal websites</title>
-    <style id="uno"></style>
+    <title>Minimal Websites</title>
+    <meta name="title" content="Minimal Websites" />
+    <meta
+      name="description"
+      content="A moderated curation platform to find and submit minimal websites"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://minweb.site/" />
+    <meta property="og:title" content="minimal websites" />
+    <meta property="og:description" content="" />
+
+    <style id="uno">
+      [uncloak] {
+        display: none;
+      }
+    </style>
     <style>
       @import url("https://unpkg.com/@fontsource/inter@5.0.15/index.css");
 
       body {
         font-family: Inter, sans-serif;
-      }
-
-      [uncloak] {
-        display: none;
       }
     </style>
   </head>
@@ -23,18 +35,29 @@
   >
     <div class="min-h-[100vh] flex flex-col justify-center w-full">
       <h3 class="p-1">MW</h3>
-      <div class="grid grid-cols-3 gap-2">
+      <div
+        id="page-loader"
+        class="loader relative w-[150px] mx-auto mt-[100px]"
+      >
+        <div
+          class="loader-skeleton h-1 w-full rounded-full bg-zinc-800 absolute top-0 left-0"
+        ></div>
+        <div
+          class="loader-progress h-1 w-10 rounded-full bg-zinc-50 absolute top-0 left-0"
+        ></div>
+      </div>
+      <div
+        id="bento-grid"
+        class="opacity-0 transition-all duration-150 delay-200 grid gap-4 grid-cols-3"
+      >
         {{ range .Links }}
-        <preview-link
-          class="border-box hover:border cursor-pointer hover:border-zinc-100 dark:hover:border-zinc-900 overflow-hidden rounded-sm hover:scale-105 transition-transform"
-          href="{{.Link}}"
-          title="{{.Title}}"
-        >
-        </preview-link>
+        <a href="{{.Link}}" class="rounded-xl">
+          <img src="{{.Meta.Image}}" alt="{{.Title}}" class="rounded-md" />
+        </a>
         {{end}}
       </div>
     </div>
-    <footer class="text-zinc-400 mb-2">
+    <footer class="text-zinc-400 mt-[100px] mb-2">
       Curated by
       <a
         class="underline text-zinc-400 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-zinc-50"
@@ -48,8 +71,9 @@
         >Arne Wiese</a
       >
     </footer>
+
     <script src="/assets/elements.js" type="module" async defer></script>
-    <script src="/assets/themer.js" type="module" async defer></script>
     <script src="/assets/uno.js" type="module" async defer></script>
+    <script src="/assets/themer.js" type="module" async defer></script>
   </body>
 </html>

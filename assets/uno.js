@@ -7,6 +7,7 @@ const uno = createGenerator({
   dark: "class",
   theme: {},
   presets: [presetUno(), presetWind(), presetTypography()],
+  safelist: ["row-span-1", "row-span-2", "hidden"],
 });
 
 const style = document.querySelector("style#uno");

@@ -1,17 +1,22 @@
 package main
 
 import (
+	"bytes"
 	"embed"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
 	"net/http"
+	"net/url"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/barelyhuman/go/env"
 	"github.com/joho/godotenv"
+
+	netHTML "golang.org/x/net/html"
 )
 
 //go:embed list.json index.html assets/*
@@ -26,6 +31,11 @@ func bail(err error) {
 type LinkGroup struct {
 	Title string
 	Link  string
+	Meta  Meta
+}
+
+type Meta struct {
+	Image string
 }
 
 type RenderResponse struct {
@@ -36,8 +46,100 @@ type App struct {
 	Port string
 }
 
-func main() {
+func (link *LinkGroup) parseMeta() {
+	res, err := http.Get(link.Link)
+	if err != nil {
+		return
+	}
+	doc, err := netHTML.Parse(res.Body)
+	if err != nil {
+		return
+	}
+	headNode, err := Head(doc)
+	if err != nil {
+		return
+	}
 
+	metaImageLink := getOpenGraphImageLink(headNode, link.Link)
+	if len(metaImageLink) == 0 {
+		metaImageLink = "https://og.barelyhuman.xyz/generate?fontSize=14&title=" + link.Title + "&fontSizeTwo=8&color=%23000"
+	}
+	link.Meta.Image = metaImageLink
+
+}
+
+func getOpenGraphImageLink(doc *netHTML.Node, base string) (link string) {
+	var crawler func(*netHTML.Node)
+	crawler = func(node *netHTML.Node) {
+		if node.Type == netHTML.ElementNode && node.Data == "meta" {
+			ogImgMeta := false
+			ogContent := ""
+			for _, a := range node.Attr {
+				if a.Key == "property" && a.Val == "og:image" {
+					ogImgMeta = true
+				}
+				if a.Key == "content" {
+					ogContent = a.Val
+				}
+			}
+			if ogImgMeta && len(ogContent) > 0 {
+				if strings.HasPrefix(ogContent, "/") {
+					joinedUrl, err := url.JoinPath(base, ogContent)
+					if err == nil {
+						ogContent = joinedUrl
+					}
+				}
+
+				resultUrl, err := url.Parse(ogContent)
+				if err != nil {
+					return
+				}
+
+				requestResponse, err := http.Get(resultUrl.String())
+				if err != nil {
+					return
+				}
+
+				if requestResponse.StatusCode != http.StatusOK {
+					return
+				}
+
+				link = resultUrl.String()
+				return
+			}
+		}
+		for child := node.FirstChild; child != nil; child = child.NextSibling {
+			crawler(child)
+		}
+	}
+
+	crawler(doc)
+	return link
+}
+
+func Head(doc *netHTML.Node) (bhead *netHTML.Node, err error) {
+	var crawler func(*netHTML.Node)
+
+	crawler = func(node *netHTML.Node) {
+		if node.Type == netHTML.ElementNode && node.Data == "head" {
+			bhead = node
+			return
+		}
+		for child := node.FirstChild; child != nil; child = child.NextSibling {
+			crawler(child)
+		}
+	}
+
+	crawler(doc)
+
+	if bhead != nil {
+		return bhead, nil
+	}
+
+	return bhead, nil
+}
+
+func main() {
 	app := App{}
 	app.configure()
 
@@ -48,11 +150,29 @@ func main() {
 	json.Unmarshal(fileBuff, &linkList)
 	sort.Sort(ByTitle(linkList))
 
+	var wg sync.WaitGroup
+	for index := range linkList {
+		index := index
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			linkList[index].parseMeta()
+		}()
+	}
+
+	wg.Wait()
+
 	templateBuff, err := sourceData.ReadFile("index.html")
 	bail(err)
 
 	tmpl, err := template.New("BaseTemplate").Parse(string(templateBuff))
 	bail(err)
+
+	var preRenderedHTML bytes.Buffer
+
+	tmpl.Execute(&preRenderedHTML, RenderResponse{
+		Links: linkList,
+	})
 
 	staticServe := http.FileServer(http.FS(sourceData))
 
@@ -76,9 +196,7 @@ func main() {
 			w.Write(responseBody)
 		}
 
-		tmpl.Execute(w, RenderResponse{
-			Links: linkList,
-		})
+		w.Write(preRenderedHTML.Bytes())
 	})
 
 	fmt.Printf("Listening on %v\n", app.Port)
@@ -86,11 +204,9 @@ func main() {
 }
 
 func (app *App) configure() {
-
 	godotenv.Load()
-
 	port := env.Get("PORT", "3000")
-	app.Port = ":" + port
+	app.Port = strings.Join([]string{":", port}, "")
 }
 
 type ByTitle []LinkGroup
