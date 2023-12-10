@@ -19,7 +19,7 @@ import (
 	netHTML "golang.org/x/net/html"
 )
 
-//go:embed list.json index.html assets/*
+//go:embed links.json index.html assets/*
 var sourceData embed.FS
 
 func bail(err error) {
@@ -143,7 +143,7 @@ func main() {
 	app := App{}
 	app.configure()
 
-	fileBuff, err := sourceData.ReadFile("list.json")
+	fileBuff, err := sourceData.ReadFile("links.json")
 	bail(err)
 
 	var linkList []LinkGroup
