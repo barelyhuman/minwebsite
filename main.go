@@ -28,7 +28,8 @@ func bail(err error) {
 }
 
 type RenderResponse struct {
-	Links []modules.LinkGroup
+	Links     []modules.LinkGroup
+	LinkCount int
 }
 
 type App struct {
@@ -59,12 +60,15 @@ func main() {
 		}
 
 		if r.URL.Path == "/about" {
-			templateCollection.ExecuteTemplate(w, "About", map[string]interface{}{})
+			templateCollection.ExecuteTemplate(w, "About", map[string]interface{}{
+				"LinkCount": len(linkList),
+			})
 			return
 		}
 
 		templateCollection.ExecuteTemplate(w, "Index", RenderResponse{
-			Links: linkList,
+			Links:     linkList,
+			LinkCount: len(linkList),
 		})
 	})
 
