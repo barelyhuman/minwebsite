@@ -51,7 +51,11 @@
         class="transition-all duration-150 delay-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
       >
         {{ range .Links }}
-        <a href="{{.Link}}" class="shadow-md dark:shadow-none dark:bg-zinc-600 border-zinc-600 rounded-xl overflow-hidden">
+        <a
+          href="{{.Link}}"
+          title="{{.Title}}"
+          class="shadow-md dark:shadow-none dark:bg-zinc-600 border-zinc-600 rounded-xl overflow-hidden"
+        >
           <img
             src="{{.Meta.Image}}"
             alt="{{.Title}}"
@@ -76,15 +80,7 @@
       >
     </footer>
 
-    <!-- If there's JS, let js load the layout-->
-    <script>
-      const gridContainer = document.getElementById("bento-grid");
-      const loader = document.getElementById("loading-text");
-      gridContainer.style.opacity = 0;
-      loader.classList.remove("opacity-0");
-    </script>
     <script src="/assets/elements.js" type="module" async defer></script>
-    <!-- <script src="/assets/uno.js" type="module" async defer></script> -->
     <script src="/assets/themer.js" type="module" async defer></script>
   </body>
 </html>

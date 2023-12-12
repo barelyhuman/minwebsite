@@ -67,7 +67,13 @@ async function createBento(maxCols = 3, gap = 10) {
         width: vDom.width + "px",
         height: vDom.height + "px",
       });
-      lastElem = vDom;
+
+      if (!lastElem) {
+        lastElem = vDom;
+      }
+      if (vDom.top + vDom.height > lastElem.top + lastElem.height) {
+        lastElem = vDom;
+      }
     });
   });
 
