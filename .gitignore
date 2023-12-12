@@ -1,3 +1,4 @@
+.DS_Store
 /minwebsite
 .env*
 !.env.example
@@ -7,3 +8,4 @@ node_modules
 
 # Generated on `go generate main.go`
 assets/css/tailwind.css
+
