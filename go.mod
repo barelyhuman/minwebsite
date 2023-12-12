@@ -6,6 +6,7 @@ require (
 	github.com/barelyhuman/go v0.2.2
 	github.com/barelyhuman/gomon v0.0.1
 	github.com/joho/godotenv v1.5.1
+	github.com/julienschmidt/httprouter v1.3.0
 	github.com/matthewmueller/migrate v0.0.0-20210914174331-dc7c5047e7b2
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 )
