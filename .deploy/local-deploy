@@ -14,6 +14,7 @@ COMMANDS="""
 mkdir -p ${APP_DIR}
 cd ${APP_DIR}
 go mod tidy 
+go run ./bin/bin.go
 go build -o ${APP_BIN} .
 . ~/.nvm/nvm.sh
 pm2 stop ${APP_NAME}

@@ -36,23 +36,22 @@
     <div class="min-h-[100vh] flex flex-col justify-center w-full">
       <h3 class="p-1">MW</h3>
       <div
-        id="page-loader"
-        class="loader relative w-[150px] mx-auto mt-[100px]"
+        id="loading-text"
+        class="transition-all duration-150 w-full h-[100px] items-center flex justify-center"
       >
-        <div
-          class="loader-skeleton h-1 w-full rounded-full bg-zinc-800 absolute top-0 left-0"
-        ></div>
-        <div
-          class="loader-progress h-1 w-10 rounded-full bg-zinc-50 absolute top-0 left-0"
-        ></div>
+        <p>Complicating Layouts ....</p>
       </div>
       <div
         id="bento-grid"
         class="opacity-0 transition-all duration-150 delay-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
       >
         {{ range .Links }}
-        <a href="{{.Link}}" class="rounded-xl">
-          <img src="{{.Meta.Image}}" alt="{{.Title}}" class="rounded-md" />
+        <a href="{{.Link}}" class="rounded-xl overflow-hidden">
+          <img
+            src="{{.Meta.Image}}"
+            alt="{{.Title}}"
+            class="object-left-top object-cover rounded-md h-full w-full"
+          />
         </a>
         {{end}}
       </div>

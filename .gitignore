@@ -1,3 +1,5 @@
 /minwebsite
 .env*
 !.env.example
+
+*.out.json

@@ -1,98 +1,151 @@
-const isElemDefined = (name) => (customElements.get(name) ? true : false);
-
 init();
 
-const SINGLE_ROW_HEIGHT = 200;
-
 function init() {
-  const hideProgressLoader = attachLoader();
-  const styleWatcher = setInterval(() => {
-    const unoStyle = document.getElementById("uno");
-    const gridContainer = document.getElementById("bento-grid");
-    if (unoStyle.innerText.includes("--un-rotate") && gridContainer) {
-      createBento();
-      clearInterval(styleWatcher);
-      hideProgressLoader();
-    }
-  }, 500);
+  waitForStyles(() => createBento());
 }
 
-function attachLoader() {
-  const loader = document.getElementById("page-loader");
-  const progress = loader.querySelector(".loader-progress");
-  const progressInterval = setInterval(() => {
-    const increments = 1;
-    let curr = parseInt(progress.style.left, 10);
-    if (isNaN(curr)) {
-      curr = 0;
+function waitForStyles(cb) {
+  const check = () => {
+    const styleHeader = document.getElementById("uno");
+    if (styleHeader.innerText.includes("--un")) {
+      return cb();
     }
-    if (curr + increments >= 100) {
-      curr = -increments;
-    } else {
-      curr += increments;
-    }
-    progress.style.left = curr + "%";
-  }, 30);
-
-  const hideProgressLoader = () => {
-    clearInterval(progressInterval);
-    loader.classList.add("hidden");
+    return setTimeout(() => {
+      check();
+    }, 150);
   };
-  return hideProgressLoader;
+  check();
 }
 
-function createBento() {
+async function createBento(maxCols = 3, gap = 10) {
   const gridContainer = document.getElementById("bento-grid");
-  if (!gridContainer) return;
 
-  const totalItems = gridContainer.children.length;
-  const totalRows = Math.ceil(totalItems / 3);
+  const gridBox = gridContainer.getBoundingClientRect();
+  const elemWidth = Math.ceil(gridBox.width / maxCols);
 
-  gridContainer.style.gridTemplateRows = `repeat(${totalRows}, minmax(0, 1fr))`;
+  const rows = Array.from(gridContainer.children).reduce((arr, item, idx) => {
+    return idx % maxCols === 0
+      ? [...arr, [item]]
+      : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
+  }, []);
 
-  for (let i = 0; i < gridContainer.children.length; i += 1) {
-    const childNode = gridContainer.children[i];
-    // childNode.style.width = elemWidth + "px";
+  let expectedPositions = [];
 
-    const img = childNode.querySelector("img");
-
-    if (img.complete || img.naturalWidth > 0) {
-      const imgSizeRatio = img.naturalHeight / img.naturalWidth;
-      const targetWidth = childNode.getBoundingClientRect().width;
-      const targetHeight = targetWidth * imgSizeRatio;
-      childNode.style.height = targetHeight + "px";
-      if (targetHeight > SINGLE_ROW_HEIGHT) {
-        childNode.classList.add("row-span-2");
-      } else {
-        childNode.classList.add("row-span-1");
+  for (let rowIndex in rows) {
+    expectedPositions[rowIndex] = [];
+    const cols = rows[rowIndex];
+    for (let colIndex in cols) {
+      if (!expectedPositions[rowIndex][colIndex]) {
+        expectedPositions[rowIndex][colIndex] = {};
       }
-      img.width = targetWidth;
-      img.height = targetHeight;
-    } else {
-      const onload = (evt) => {
-        const target = evt.target;
-        const imgSizeRatio = target.height / target.width;
-        const targetWidth = childNode.getBoundingClientRect().width;
-        const targetHeight = targetWidth * imgSizeRatio;
-        target.width = targetWidth;
-        target.height = targetHeight;
+      const col = cols[colIndex];
+      const img = col.querySelector("img");
+      const dimensions = await getImageNaturalDimensions(img);
+      const expectedWidth = elemWidth;
+      const expectedHeight = elemWidth * dimensions.ratio;
+      let prevLeft = expectedPositions[rowIndex][colIndex - 1];
+      let prevTop;
+      if (rowIndex > 0) {
+        prevTop = expectedPositions[rowIndex - 1][colIndex];
+      } else {
+        prevTop = {
+          top: -expectedHeight,
+          height: expectedHeight,
+        };
+      }
 
-        if (targetHeight > SINGLE_ROW_HEIGHT) {
-          childNode.classList.add("row-span-2");
-        } else {
-          childNode.classList.add("row-span-1");
-        }
+      if (!prevLeft) {
+        prevLeft = {
+          left: -expectedWidth,
+        };
+      }
 
-        childNode.style.height = targetWidth * imgSizeRatio + "px";
+      expectedPositions[rowIndex][colIndex] = {
+        elem: col,
+        left: prevLeft.left + gap + expectedWidth,
+        top: prevTop.top + gap + prevTop.height,
+        height: expectedHeight,
+        width: expectedWidth,
       };
-
-      img.addEventListener("load", onload);
     }
-
-    img.addEventListener("error", (evt) => {
-      evt.target.src = `https://og.barelyhuman.xyz/generate?fontSize=14&title=${evt.target.alt}&fontSizeTwo=8&color=%23000`;
-    });
   }
 
+  let lastElem;
+  expectedPositions.forEach((rows) => {
+    rows.forEach((vDom) => {
+      Object.assign(vDom.elem.style, {
+        position: "absolute",
+        top: vDom.top + "px",
+        left: vDom.left + "px",
+        width: vDom.width + "px",
+        height: vDom.height + "px",
+      });
+      lastElem = vDom;
+    });
+  });
+
+  Object.assign(gridContainer.style, {
+    height: lastElem.top + lastElem.height + "px",
+  });
+  gridContainer.classList.remove("grid");
+  gridContainer.classList.add("relative");
   gridContainer.classList.remove("opacity-0");
+
+  removeLoader();
+}
+
+/**
+ *
+ * @param {HTMLElement[]} children
+ * @returns
+ */
+function nodesToImageMeta(children) {
+  const imageMeta = [];
+  for (let child of children) {
+    const img = child.querySelector("img");
+    if (img.naturalWidth > 0) {
+      imageMeta.push(gatherImageMeta(img));
+    } else {
+      img.addEventListener("load", (evt) => {
+        imageMeta.push(gatherImageMeta(evt.target));
+      });
+    }
+  }
+  return imageMeta;
+}
+
+/**
+ *
+ * @param {HTMLImageElement} img
+ * @returns
+ */
+async function getImageNaturalDimensions(img) {
+  if (img.naturalHeight > 0) {
+    return {
+      height: img.naturalHeight,
+      width: img.naturalWidth,
+      ratio: img.naturalHeight / img.naturalWidth,
+    };
+  }
+
+  let promise, resolve;
+
+  promise = new Promise((_resolve) => {
+    resolve = _resolve;
+  });
+
+  img.addEventListener("load", (evt) => {
+    resolve({
+      height: evt.target.naturalHeight,
+      width: evt.target.naturalWidth,
+      ratio: evt.target.naturalHeight / evt.target.naturalWidth,
+    });
+  });
+
+  return promise;
+}
+
+function removeLoader() {
+  const loader = document.getElementById("loading-text");
+  loader.parentNode.removeChild(loader);
 }
