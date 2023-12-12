@@ -49,8 +49,7 @@ func (link *LinkGroup) ParseMeta() {
 
 	metaImageLink := getOpenGraphImageLink(headNode, link.Link)
 	if len(metaImageLink) == 0 {
-		parsedURL, _ := url.Parse("https://og.barelyhuman.xyz/generate?fontSize=14&title=" + link.Title + "&fontSizeTwo=8&color=%23000")
-		metaImageLink = parsedURL.String()
+		metaImageLink = getFallbackURL(link.Title)
 		link.Meta.UsesFallback = true
 	}
 	link.Meta.Image = metaImageLink
@@ -125,4 +124,13 @@ func Head(doc *netHTML.Node) (bhead *netHTML.Node, err error) {
 	}
 
 	return bhead, nil
+}
+
+func getFallbackURL(title string) string {
+	validUrl, err := url.Parse("https://og.sznm.dev/api/generate?heading=" + title + "&template=plain")
+	// url.Parse("https://og.barelyhuman.xyz/generate?fontSize=14&title=" + link.Title + "&fontSizeTwo=8&color=%23000")
+	if err != nil {
+		return ""
+	}
+	return validUrl.String()
 }
