@@ -1,4 +1,5 @@
 //go:generate npm run build
+//go:generate go run ./bin/prepare.go
 
 package main
 

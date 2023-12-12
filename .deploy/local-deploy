@@ -16,7 +16,7 @@ cd ${APP_DIR}
 . ~/.nvm/nvm.sh
 npm i
 go mod tidy 
-go run ./bin/bin.go
+go generate .
 go build -o ${APP_BIN} .
 pm2 stop ${APP_NAME}
 pm2 start "${APP_BIN}" --name=${APP_NAME}
