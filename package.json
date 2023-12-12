@@ -1,0 +1,23 @@
+{
+  "name": "minweb.site",
+  "version": "0.0.0",
+  "description": "> The Minimal Website Curation Index",
+  "scripts": {
+    "build": "npm run build:css",
+    "build:css":"tailwindcss build -o assets/css/tailwind.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/barelyhuman/minwebsite.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/barelyhuman/minwebsite/issues"
+  },
+  "homepage": "https://github.com/barelyhuman/minwebsite#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.3.6"
+  }
+}

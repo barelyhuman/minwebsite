@@ -10,17 +10,11 @@
       content="A moderated curation platform to find and submit minimal websites"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://minweb.site/" />
     <meta property="og:title" content="minimal websites" />
     <meta property="og:description" content="" />
-
-    <style id="uno">
-      [uncloak] {
-        display: none;
-      }
-    </style>
+    <link href="/assets/css/tailwind.css" rel="stylesheet" />
     <style>
       @import url("https://unpkg.com/@fontsource/inter@5.0.15/index.css");
 
@@ -37,16 +31,27 @@
       <h3 class="p-1">MW</h3>
       <div
         id="loading-text"
-        class="transition-all duration-150 w-full h-[100px] items-center flex justify-center"
+        class="opacity-0 duration-150 w-full h-[100px] items-center flex justify-center gap-2"
       >
-        <p>Complicating Layouts ....</p>
+        <div>Complicating</div>
+        <div class="flex items-center gap-1">
+          <span
+            class="bg-zinc-700 dark:bg-zinc-50 h-1 w-1 rounded-full animate-[bounce_1s_infinite_100ms]"
+          ></span>
+          <span
+            class="bg-zinc-700 dark:bg-zinc-50 h-1 w-1 rounded-full animate-[bounce_1s_infinite_150ms]"
+          ></span>
+          <span
+            class="bg-zinc-700 dark:bg-zinc-50 h-1 w-1 rounded-full animate-[bounce_1s_infinite_300ms]"
+          ></span>
+        </div>
       </div>
       <div
         id="bento-grid"
-        class="opacity-0 transition-all duration-150 delay-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+        class="transition-all duration-150 delay-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
       >
         {{ range .Links }}
-        <a href="{{.Link}}" class="rounded-xl overflow-hidden">
+        <a href="{{.Link}}" class="shadow-md dark:shadow-none dark:bg-zinc-600 border-zinc-600 rounded-xl overflow-hidden">
           <img
             src="{{.Meta.Image}}"
             alt="{{.Title}}"
@@ -71,8 +76,15 @@
       >
     </footer>
 
+    <!-- If there's JS, let js load the layout-->
+    <script>
+      const gridContainer = document.getElementById("bento-grid");
+      const loader = document.getElementById("loading-text");
+      gridContainer.style.opacity = 0;
+      loader.classList.remove("opacity-0");
+    </script>
     <script src="/assets/elements.js" type="module" async defer></script>
-    <script src="/assets/uno.js" type="module" async defer></script>
+    <!-- <script src="/assets/uno.js" type="module" async defer></script> -->
     <script src="/assets/themer.js" type="module" async defer></script>
   </body>
 </html>

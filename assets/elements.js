@@ -1,20 +1,7 @@
 init();
 
 function init() {
-  waitForStyles(() => createBento());
-}
-
-function waitForStyles(cb) {
-  const check = () => {
-    const styleHeader = document.getElementById("uno");
-    if (styleHeader.innerText.includes("--un")) {
-      return cb();
-    }
-    return setTimeout(() => {
-      check();
-    }, 150);
-  };
-  check();
+  createBento();
 }
 
 async function createBento(maxCols = 3, gap = 10) {
@@ -89,33 +76,13 @@ async function createBento(maxCols = 3, gap = 10) {
   });
   gridContainer.classList.remove("grid");
   gridContainer.classList.add("relative");
-  gridContainer.classList.remove("opacity-0");
+
+  gridContainer.style.opacity = 1;
 
   removeLoader();
 }
 
 /**
- *
- * @param {HTMLElement[]} children
- * @returns
- */
-function nodesToImageMeta(children) {
-  const imageMeta = [];
-  for (let child of children) {
-    const img = child.querySelector("img");
-    if (img.naturalWidth > 0) {
-      imageMeta.push(gatherImageMeta(img));
-    } else {
-      img.addEventListener("load", (evt) => {
-        imageMeta.push(gatherImageMeta(evt.target));
-      });
-    }
-  }
-  return imageMeta;
-}
-
-/**
- *
  * @param {HTMLImageElement} img
  * @returns
  */

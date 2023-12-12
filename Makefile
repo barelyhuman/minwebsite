@@ -8,4 +8,5 @@ deploy:
 	./.deploy/local-deploy
 
 dev:
+	go generate main.go
 	go run github.com/barelyhuman/gomon -w "." -exclude="assets" .
