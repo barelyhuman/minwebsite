@@ -10,7 +10,7 @@ async function createBento(maxCols = 3, gap = 16) {
   const gridContainer = document.getElementById("bento-grid");
 
   const gridBox = gridContainer.getBoundingClientRect();
-  const elemWidth = Math.ceil(gridBox.width / maxCols);
+  const elemWidth = Math.ceil(gridBox.width / maxCols) - gap;
 
   const rows = Array.from(gridContainer.children).reduce((arr, item, idx) => {
     return idx % maxCols === 0
@@ -45,7 +45,7 @@ async function createBento(maxCols = 3, gap = 16) {
 
       if (!prevLeft) {
         prevLeft = {
-          left: -expectedWidth,
+          left: -(expectedWidth + gap/2),
         };
       }
 
