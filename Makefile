@@ -9,4 +9,4 @@ deploy:
 
 dev:
 	go generate main.go
-	go run github.com/barelyhuman/gomon -w "." -exclude="assets" .
+	go run github.com/barelyhuman/gomon -w "." -exclude=".minwebinternals" .

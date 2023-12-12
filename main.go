@@ -19,7 +19,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-//go:embed links.out.json templates/*.html templates/**/*.html assets/*
+//go:embed templates/*.html templates/**/*.html assets/*
 var sourceData embed.FS
 
 func bail(err error) {
@@ -38,13 +38,16 @@ type App struct {
 	Templates  *template.Template
 	Links      []modules.LinkGroup
 	FileServer http.Handler
+	Data       Data
 }
 
 func main() {
 	app := App{}
 	app.configure()
 
-	fileBuff, err := os.ReadFile("links.out.json")
+	bail(app.Data.Connect())
+
+	fileBuff, err := os.ReadFile(".minwebinternals/links.out.json")
 	bail(err)
 
 	json.Unmarshal(fileBuff, &app.Links)
@@ -61,6 +64,9 @@ func main() {
 
 	router.GET("/", IndexHandler(&app))
 	router.GET("/about", AboutHandler(&app))
+	router.GET("/login", LoginGetHandler(&app))
+	router.POST("/login", LoginPostHandler(&app))
+	router.GET("/admin", AdminGetHandler(&app))
 	router.GET("/assets/*assetPath", AssetHandler(&app))
 
 	fmt.Printf("Listening on %v\n", app.Port)
@@ -71,6 +77,7 @@ func (app *App) configure() {
 	godotenv.Load()
 	port := env.Get("PORT", "3000")
 	app.Port = strings.Join([]string{":", port}, "")
+
 }
 
 func IndexHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -93,5 +100,42 @@ func AboutHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httpr
 func AssetHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		app.FileServer.ServeHTTP(w, r)
+	}
+}
+
+func LoginGetHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		app.Templates.ExecuteTemplate(w, "LoginPage", map[string]interface{}{
+			"LinkCount": len(app.Links),
+		})
+	}
+}
+
+func LoginPostHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		r.ParseForm()
+		username := r.Form.Get("username")
+		password := r.Form.Get("password")
+
+		err := app.Data.Authenticate(username, password)
+
+		if err != nil {
+			// invalid credential
+			// Unauthenticated user
+			// Error Alerts to the templates
+			return
+		}
+
+		// Non-permanent redirect
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
+	}
+}
+
+func AdminGetHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		app.Templates.ExecuteTemplate(w, "AdminHome",
+			map[string]interface{}{
+				"LinkCount": len(app.Links),
+			})
 	}
 }

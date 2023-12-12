@@ -30,5 +30,5 @@ func main() {
 	wg.Wait()
 
 	out, _ := json.Marshal(&links)
-	os.WriteFile("links.out.json", out, os.ModePerm)
+	os.WriteFile(".minwebinternals/links.out.json", out, os.ModePerm)
 }

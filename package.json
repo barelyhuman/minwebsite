@@ -4,6 +4,7 @@
   "description": "> The Minimal Website Curation Index",
   "scripts": {
     "build": "npm run build:css;npm run build:js",
+    "dev:css": "tailwindcss build -o assets/css/tailwind.css --watch",
     "build:css": "tailwindcss build -o assets/css/tailwind.css",
     "build:js": "node build.js"
   },
@@ -19,6 +20,7 @@
   },
   "homepage": "https://github.com/barelyhuman/minwebsite#readme",
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
     "esbuild": "^0.19.9",
     "tailwindcss": "^3.3.6"
