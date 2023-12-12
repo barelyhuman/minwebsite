@@ -1,34 +1,10 @@
+{{define "Index"}}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Minimal Websites</title>
-    <meta name="title" content="Minimal Websites" />
-    <meta
-      name="description"
-      content="A moderated curation platform to find and submit minimal websites"
-    />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://minweb.site/" />
-    <meta property="og:title" content="minimal websites" />
-    <meta property="og:description" content="" />
-    <link href="/assets/css/tailwind.css" rel="stylesheet" />
-    <style>
-      @import url("https://unpkg.com/@fontsource/inter@5.0.15/index.css");
-
-      body {
-        font-family: Inter, sans-serif;
-      }
-    </style>
-  </head>
-  <body
-    uncloak
-    class="px-2 mx-auto max-w-5xl dark:bg-zinc-900 dark:text-zinc-400"
-  >
-    <div class="min-h-[100vh] flex flex-col justify-center w-full">
-      <h3 class="p-1">MW</h3>
+  {{template "GlobalHead"}}
+  <body class="px-2 mx-auto max-w-5xl dark:bg-zinc-900 dark:text-zinc-400">
+    {{template "GlobalHeader"}}
+    <div class="min-h-[80vh] flex flex-col justify-center w-full">
       <div
         id="loading-text"
         class="opacity-0 duration-150 w-full h-[100px] items-center flex justify-center gap-2"
@@ -84,3 +60,5 @@
     <script src="/assets/themer.js" type="module" async defer></script>
   </body>
 </html>
+
+{{end}}

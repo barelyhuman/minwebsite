@@ -18,7 +18,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-//go:embed links.out.json index.html assets/*
+//go:embed links.out.json templates/*.html templates/**/*.html assets/*
 var sourceData embed.FS
 
 func bail(err error) {
@@ -45,11 +45,12 @@ func main() {
 	var linkList []modules.LinkGroup
 	json.Unmarshal(fileBuff, &linkList)
 
-	templateBuff, err := sourceData.ReadFile("index.html")
+	templateCollection, err := template.ParseFS(sourceData, "templates/**/*.html")
 	bail(err)
 
-	tmpl, err := template.New("BaseTemplate").Parse(string(templateBuff))
+	templateCollection, err = templateCollection.ParseFS(sourceData, "templates/*.html")
 	bail(err)
+
 	staticServe := http.FileServer(http.FS(sourceData))
 	globalHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" && strings.HasPrefix(r.URL.Path, "/assets") {
@@ -57,10 +58,14 @@ func main() {
 			return
 		}
 
-		tmpl.Execute(w, RenderResponse{
+		if r.URL.Path == "/about" {
+			templateCollection.ExecuteTemplate(w, "About", map[string]interface{}{})
+			return
+		}
+
+		templateCollection.ExecuteTemplate(w, "Index", RenderResponse{
 			Links: linkList,
 		})
-		return
 	})
 
 	fmt.Printf("Listening on %v\n", app.Port)

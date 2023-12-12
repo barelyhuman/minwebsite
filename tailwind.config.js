@@ -1,7 +1,7 @@
 const { fontFamily } = require("tailwindcss/defaultTheme");
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./index.html", "./assets/**/*.js"],
+  content: ["./templates/**/*.html", "./assets/**/*.js"],
   theme: {
     extend: {
       fontFamily: {
@@ -9,5 +9,7 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require("@tailwindcss/typography")
+  ],
 };

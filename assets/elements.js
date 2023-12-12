@@ -1,10 +1,12 @@
 init();
 
 function init() {
-  createBento();
+  window.addEventListener("DOMContentLoaded", () => {
+    createBento();
+  });
 }
 
-async function createBento(maxCols = 3, gap = 10) {
+async function createBento(maxCols = 3, gap = 16) {
   const gridContainer = document.getElementById("bento-grid");
 
   const gridBox = gridContainer.getBoundingClientRect();
