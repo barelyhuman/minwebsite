@@ -13,14 +13,15 @@ APP_NAME="minweb"
 COMMANDS="""
 mkdir -p ${APP_DIR}
 cd ${APP_DIR}
+. ~/.nvm/nvm.sh
+npm i
 go mod tidy 
 go run ./bin/bin.go
 go build -o ${APP_BIN} .
-. ~/.nvm/nvm.sh
 pm2 stop ${APP_NAME}
 pm2 start "${APP_BIN}" --name=${APP_NAME}
 """
 
-rsync -aP --exclude=".git" --exclude=".env" ./ "${DEPLOY_HOST}:${APP_DIR}"
+rsync -aP --exclude=".git" --exclude="node_modules" --exclude=".env" ./ "${DEPLOY_HOST}:${APP_DIR}"
 
 ssh "${DEPLOY_HOST}" "/bin/bash -c '$COMMANDS'"
