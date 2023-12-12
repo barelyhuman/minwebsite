@@ -8,4 +8,5 @@ node_modules
 
 # Generated on `go generate main.go`
 assets/css/tailwind.css
+assets/bundle
 
