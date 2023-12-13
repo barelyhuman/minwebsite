@@ -127,7 +127,7 @@ func Head(doc *netHTML.Node) (bhead *netHTML.Node, err error) {
 }
 
 func getFallbackURL(title string) string {
-	validUrl, err := url.Parse("https://og.barelyhuman.xyz/generate?fontSize=14&title=" + title + "&fontSizeTwo=8&color=%23000")
+	validUrl, err := url.Parse("https://og.barelyhuman.xyz/generate?fontSize=14&backgroundColor=%23121212&title=" + title + "&fontSizeTwo=8&color=%23efefef")
 	if err != nil {
 		return ""
 	}
