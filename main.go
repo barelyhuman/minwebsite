@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	modules "github.com/barelyhuman/minwebsite/modules"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 
 	"github.com/barelyhuman/go/env"
 	"github.com/joho/godotenv"
@@ -88,9 +89,13 @@ func (app *App) configure() {
 
 func IndexHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		search := r.URL.Query().Get("q")
+
+		links := FuzzyResult(search, app.Links)
+
 		app.Templates.ExecuteTemplate(w, "Index", RenderResponse{
-			Links:      app.Links,
-			LinkCount:  len(app.Links),
+			Links:      links,
+			LinkCount:  len(links),
 			Categories: app.Categories,
 		})
 	}
@@ -99,6 +104,7 @@ func IndexHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httpr
 func CategoryHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		category := p.ByName("category")
+		search := r.URL.Query().Get("q")
 
 		if category == "all" {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -113,6 +119,8 @@ func CategoryHandler(app *App) func(w http.ResponseWriter, r *http.Request, p ht
 			}
 			byCategory = append(byCategory, lg)
 		}
+
+		byCategory = FuzzyResult(search, byCategory)
 
 		app.Templates.ExecuteTemplate(w, "Index", RenderResponse{
 			Links:      byCategory,
@@ -194,4 +202,20 @@ func GetCategories(links []modules.LinkGroup) Categories {
 	}
 
 	return categories
+}
+
+func FuzzyResult(search string, links []modules.LinkGroup) (result []modules.LinkGroup) {
+	if len(search) > 0 {
+		for _, lg := range links {
+			matchedTitle := fuzzy.Match(strings.ToLower(search), strings.ToLower(lg.Title))
+			matchedLink := fuzzy.Match(strings.ToLower(search), strings.ToLower(lg.Link))
+			if matchedTitle || matchedLink {
+				result = append(result, lg)
+			}
+		}
+	} else {
+		result = links
+	}
+
+	return
 }
