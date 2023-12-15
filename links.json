@@ -1,174 +1,217 @@
 [
   {
     "title": "Agustinus Nathaniel",
-    "link": "https://sznm.dev"
+    "link": "https://sznm.dev",
+    "category": "personal"
   },
   {
     "title": "Ilya Mikailov (CodeChips)",
-    "link": "https://codechips.me"
+    "link": "https://codechips.me",
+    "category": "personal"
   },
   {
     "title": "Rasmus Andersson",
-    "link": "https://rsms.me/"
+    "link": "https://rsms.me/",
+    "category": "personal"
   },
   {
     "title": "ADXY (Adarsh Bhadauria)",
-    "link": "https://beta.adxy.dev"
+    "link": "https://beta.adxy.dev",
+    "category": "personal"
   },
   {
     "title": "Paco Coursey",
-    "link": "https://paco.me/"
+    "link": "https://paco.me/",
+    "category": "personal"
   },
   {
     "title": "Jesse Li",
-    "link": "https://blog.jse.li"
+    "link": "https://blog.jse.li",
+    "category": "personal"
   },
   {
     "title": "Tom Lienard",
-    "link": "https://tom.lnrd.fr"
+    "link": "https://tom.lnrd.fr",
+    "category": "personal"
   },
   {
     "title": "Carl Barenbrug",
-    "link": "https://carlbarenbrug.com"
+    "link": "https://carlbarenbrug.com",
+    "category": "personal"
   },
   {
     "title": "Tim Ritter",
-    "link": "https://www.tim-ritter.com"
+    "link": "https://www.tim-ritter.com",
+    "category": "personal"
   },
   {
     "title": "Mitul Shah",
-    "link": "https://mitul.ca"
+    "link": "https://mitul.ca",
+    "category": "personal"
   },
   {
     "title": "Billy Sweeney",
-    "link": "https://billysweeney.com"
+    "link": "https://billysweeney.com",
+    "category": "personal"
   },
   {
     "title": "Chester How",
-    "link": "https://chester.how"
+    "link": "https://chester.how",
+    "category": "personal"
   },
   {
     "title": "Michael Andreuzza",
-    "link": "https://michaelandreuzza.com"
+    "link": "https://michaelandreuzza.com",
+    "category": "personal"
   },
   {
     "title": "Studio Voila",
-    "link": "https://studiovoila.com"
+    "link": "https://studiovoila.com",
+    "category": "company"
   },
   {
     "title": "Linus Rogge",
-    "link": "https://linusrogge.com"
+    "link": "https://linusrogge.com",
+    "category": "personal"
   },
   {
     "title": "goods.wtf",
-    "link": "https://goods.wtf"
+    "link": "https://goods.wtf",
+    "category": "company"
   },
   {
     "title": "Emil Kowalski",
-    "link": "https://emilkowal.ski"
+    "link": "https://emilkowal.ski",
+    "category": "personal"
   },
   {
     "title": "Compound Planning",
-    "link": "https://compoundplanning.com"
+    "link": "https://compoundplanning.com",
+    "category": "company"
   },
   {
     "title": "Significa",
-    "link": "https://significa.co/projects"
+    "link": "https://significa.co/projects",
+    "category": "company"
   },
   {
     "title": "Julien Thibeaut",
-    "link": "https://www.julienthibeaut.xyz"
+    "link": "https://www.julienthibeaut.xyz",
+    "category": "personal"
   },
   {
-    "title": "Manuel Moreale (Portfolio)",
-    "link": "https://manuelmoreale.dev/"
+    "title": "Manuel Moreale (personal)",
+    "link": "https://manuelmoreale.dev/",
+    "category": "personal"
   },
   {
     "title": "Manuel Moreale (Blog)",
-    "link": "https://manuelmoreale.com/"
+    "link": "https://manuelmoreale.com/",
+    "category": "personal"
   },
   {
     "title": "Mellow",
-    "link": "https://mellow.dev"
+    "link": "https://mellow.dev",
+    "category": "personal"
   },
   {
     "title": "Jointaste.de",
-    "link": "https://www.jointaste.de/"
+    "link": "https://www.jointaste.de/",
+    "category": "company"
   },
   {
     "title": "Kevin Dukkon",
-    "link": "https://www.kevdu.co/"
+    "link": "https://www.kevdu.co/",
+    "category": "personal"
   },
   {
     "title": "Positive Intelligence",
-    "link": "https://www.positiveintelligence.com/"
+    "link": "https://www.positiveintelligence.com/",
+    "category": "company"
   },
   {
     "title": "New Computer",
-    "link": "https://new.computer/"
+    "link": "https://new.computer/",
+    "category": "company"
   },
   {
     "title": "kwon",
-    "link": "https://kwon.nyc/"
+    "link": "https://kwon.nyc/",
+    "category": "personal"
   },
   {
     "title": "Craig Mod",
-    "link": "https://craigmod.com/"
+    "link": "https://craigmod.com/",
+    "category": "personal"
   },
   {
     "title": "PJ Onori's blog",
-    "link": "https://pjonori.blog"
+    "link": "https://pjonori.blog",
+    "category": "personal"
   },
   {
     "title": "Brian Koberlein",
-    "link": "https://briankoberlein.com"
+    "link": "https://briankoberlein.com",
+    "category": "personal"
   },
   {
     "title": "I Need More Coffee (Sohal Sudheer)",
-    "link": "https://ineedmore.coffee"
+    "link": "https://ineedmore.coffee",
+    "category": "personal"
   },
   {
     "title": "mnmlist·me",
-    "link": "https://mnmlist.me"
+    "link": "https://mnmlist.me",
+    "category": "personal"
   },
   {
     "title": "Notes by Rodrigo Ghedin",
-    "link": "https://notes.ghed.in"
+    "link": "https://notes.ghed.in",
+    "category": "personal"
   },
   {
     "title": "Kunall Banerjee",
-    "link": "https://kimchiii.space"
+    "link": "https://kimchiii.space",
+    "category": "personal"
   },
   {
     "title": "Chris Collins",
-    "link": "https://www.scottishstoater.com"
+    "link": "https://www.scottishstoater.com",
+    "category": "personal"
   },
   {
     "title": "575 life in haiku",
-    "link": "https://575.life"
+    "link": "https://575.life",
+    "category": "personal"
   },
   {
-    "title":"David William Baum",
-    "link":"https://www.davidwilliambaum.com"
+    "title": "David William Baum",
+    "link": "https://www.davidwilliambaum.com",
+    "category": "personal"
   },
   {
-    "title":"Steph Ango",
-    "link":"https://stephango.com"
+    "title": "Steph Ango",
+    "link": "https://stephango.com",
+    "category": "personal"
   },
   {
-    "title":"Hundred Rabbits",
-    "link":"https://100r.co"
+    "title": "Hundred Rabbits",
+    "link": "https://100r.co",
+    "category": "company"
   },
   {
-    "title":"Icyphox",
-    "link":"https://icyphox.sh/"
+    "title": "Icyphox",
+    "link": "https://icyphox.sh/",
+    "category": "personal"
   },
   {
-    "title":"Nerdy Pepper",
-    "link":"http://peppe.rs/"
+    "title": "Nerdy Pepper",
+    "link": "http://peppe.rs/",
+    "category": "personal"
   },
   {
-    "title":"Open Purpose",
-    "link":"https://openpurpose.com"
+    "title": "Open Purpose",
+    "link": "https://openpurpose.com",
+    "category": "company"
   }
 ]

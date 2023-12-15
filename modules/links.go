@@ -23,9 +23,10 @@ func (a ByTitle) Less(i, j int) bool {
 }
 
 type LinkGroup struct {
-	Title string `json:"title"`
-	Link  string `json:"link"`
-	Meta  Meta   `json:"meta"`
+	Title    string `json:"title"`
+	Link     string `json:"link"`
+	Category string `json:"category"`
+	Meta     Meta   `json:"meta"`
 }
 
 type Meta struct {
