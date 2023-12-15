@@ -4,9 +4,20 @@ function init() {
   window.addEventListener("DOMContentLoaded", () => {
     createBento();
   });
+
+  window.addEventListener("resize", () => {
+    createBento();
+  });
 }
 
 async function createBento(maxCols = 3, gap = 16) {
+  const windowWidth = window.innerWidth;
+  if (windowWidth < 640) {
+    maxCols = 1;
+  } else if (windowWidth < 768) {
+    maxCols -= 1;
+  }
+
   const gridContainer = document.getElementById("bento-grid");
 
   const gridBox = gridContainer.getBoundingClientRect();
@@ -45,7 +56,7 @@ async function createBento(maxCols = 3, gap = 16) {
 
       if (!prevLeft) {
         prevLeft = {
-          left: -(expectedWidth + gap/2),
+          left: -(expectedWidth + gap / 2),
         };
       }
 
@@ -122,5 +133,7 @@ async function getImageNaturalDimensions(img) {
 
 function removeLoader() {
   const loader = document.getElementById("loading-text");
-  loader.parentNode.removeChild(loader);
+  if (loader) {
+    loader.parentNode.removeChild(loader);
+  }
 }

@@ -22,9 +22,9 @@
     >Add Your Site?</a
   >
 </div>
-<div class="flex w-full items-start justify-between">
-  <div class="flex flex-col gap-2 mx-2">
-    <span class="font-semibold text-zinc-700 dark:text-zinc-300">
+<div class="flex flex-wrap w-full items-start justify-between">
+  <div class="flex flex-col gap-2 mx-2 sm:order-2">
+    <span class="font-semibold my-4 text-zinc-700 dark:text-zinc-300">
       Categories
     </span>
     <ul class="flex items-center justify-center gap-4">
@@ -39,7 +39,9 @@
       {{end}}
     </ul>
   </div>
-  <div class="w-[250px] mx-5 self-center justify-self-center">
+  <div
+    class="w-[250px] mx-5 order-last sm:order-2 my-4 self-center justify-self-center"
+  >
     <form class="w-full">
       <input
         type="search"
@@ -49,7 +51,7 @@
       />
     </form>
   </div>
-  <div>
+  <div class="sm:order-3 my-4">
     <p>
       Collection
       <span class="font-semibold text-zinc-700 dark:text-zinc-300"
