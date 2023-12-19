@@ -107,12 +107,12 @@
   {
     "title": "Manuel Moreale (Blog)",
     "link": "https://manuelmoreale.com/",
-    "category": "personal"
+    "category": "blog"
   },
   {
     "title": "Mellow",
     "link": "https://mellow.dev",
-    "category": "personal"
+    "category": "blog"
   },
   {
     "title": "Jointaste.de",
@@ -147,7 +147,7 @@
   {
     "title": "PJ Onori's blog",
     "link": "https://pjonori.blog",
-    "category": "personal"
+    "category": "blog"
   },
   {
     "title": "Brian Koberlein",
@@ -157,7 +157,7 @@
   {
     "title": "I Need More Coffee (Sohal Sudheer)",
     "link": "https://ineedmore.coffee",
-    "category": "personal"
+    "category": "blog"
   },
   {
     "title": "mnmlist·me",
@@ -167,7 +167,7 @@
   {
     "title": "Notes by Rodrigo Ghedin",
     "link": "https://notes.ghed.in",
-    "category": "personal"
+    "category": "blog"
   },
   {
     "title": "Kunall Banerjee",
@@ -192,7 +192,7 @@
   {
     "title": "Steph Ango",
     "link": "https://stephango.com",
-    "category": "personal"
+    "category": "blog"
   },
   {
     "title": "Hundred Rabbits",
@@ -207,11 +207,16 @@
   {
     "title": "Nerdy Pepper",
     "link": "http://peppe.rs/",
-    "category": "personal"
+    "category": "blog"
   },
   {
     "title": "Open Purpose",
     "link": "https://openpurpose.com",
     "category": "company"
+  },
+  {
+    "title":"Alex Kondov",
+    "link":"https://alexkondov.com",
+    "category": "blog"
   }
 ]
