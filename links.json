@@ -215,8 +215,33 @@
     "category": "company"
   },
   {
-    "title":"Alex Kondov",
-    "link":"https://alexkondov.com",
+    "title": "Alex Kondov",
+    "link": "https://alexkondov.com",
+    "category": "blog"
+  },
+  {
+    "title": "Andy Bell",
+    "link": "https://andy-bell.co.uk",
+    "category": "personal"
+  },
+  {
+    "title": "Backend Cafe",
+    "link": "https://backend.cafe/",
+    "category": "blog"
+  },
+  {
+    "title": "Carlos Becker",
+    "link": "https://carlosbecker.com",
+    "category": "personal"
+  },
+  {
+    "title": "Josh Bleecher Snyder",
+    "link": "https://commaok.xyz",
+    "category": "personal"
+  },
+  {
+    "title": "Ty Hopp",
+    "link": "https://tyhopp.com/",
     "category": "blog"
   }
 ]
