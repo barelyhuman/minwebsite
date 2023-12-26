@@ -248,5 +248,15 @@
     "title": "FlameyFox",
     "link": "https://flameyfox.com/",
     "category": "personal"
+  },
+  {
+    "title": "Omar Aziz",
+    "link": "https://omaraziz.dev/",
+    "category": "personal"
+  },
+  {
+    "title": "Shubham Kumar Anand",
+    "link": "https://imskanand.vercel.app/",
+    "category": "personal"
   }
 ]
