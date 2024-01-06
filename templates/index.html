@@ -30,16 +30,18 @@
         <a
           href="{{.Link}}"
           title="{{.Title}}"
-          class="shadow-md group relative dark:shadow-none dark:bg-zinc-600 border-zinc-600 rounded-xl overflow-hidden"
+          class="shadow-md group relative dark:shadow-none h-fit dark:bg-zinc-600 border-zinc-600 rounded-xl overflow-hidden"
         >
-        <!-- Overlay -->
-        <div class="absolute bottom-0 left-0 w-full h-0 flex flex-col justify-end pb-2 items-center bg-lime-400 opacity-0 group-hover:h-12 group-hover:opacity-100 duration-500">
-          <p class="text-zinc-900">URL: {{.Link}}</p>
-        </div>
+          <!-- Overlay -->
+          <div
+            class="absolute bottom-0 left-0 w-full h-0 flex flex-col justify-end pb-2 items-center bg-lime-400 opacity-0 group-hover:h-12 group-hover:opacity-100 duration-500"
+          >
+            <p class="text-zinc-900">URL: {{.Link}}</p>
+          </div>
           <img
             src="{{.Meta.Image}}"
             alt="{{.Title}}"
-            class="object-left-top object-cover rounded-md h-full w-full"
+            class="object-left-top object-cover rounded-md w-full"
           />
         </a>
         {{end}}
@@ -60,7 +62,7 @@
       >
     </footer>
 
-    <script src="/assets/bundle/elements.js" type="module"></script>
+    <script src="/assets/bundle/elements.js" type="module" async defer></script>
     <script src="/assets/bundle/themer.js" type="module" async defer></script>
   </body>
 </html>
