@@ -8,19 +8,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
-	"os"
 	"strings"
+	"time"
 
+	"github.com/barelyhuman/minwebsite/models"
 	modules "github.com/barelyhuman/minwebsite/modules"
+	"github.com/jmoiron/sqlx"
 	"github.com/lithammer/fuzzysearch/fuzzy"
+
+	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/barelyhuman/go/env"
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 )
 
-//go:embed templates/*.html templates/**/*.html assets/*
+//go:embed links.json templates/*.html templates/**/*.html assets/*
 var sourceData embed.FS
 
 func bail(err error) {
@@ -32,7 +37,7 @@ func bail(err error) {
 type Categories []string
 
 type RenderResponse struct {
-	Links      []modules.LinkGroup
+	Links      []models.Links
 	LinkCount  int
 	Categories Categories
 }
@@ -40,22 +45,26 @@ type RenderResponse struct {
 type App struct {
 	Port       string
 	Templates  *template.Template
-	Links      []modules.LinkGroup
+	FS         *embed.FS
+	Links      []models.Links
 	Categories Categories
 	FileServer http.Handler
-	Data       Data
+	DB         *sqlx.DB
 }
 
 func main() {
 	app := App{}
 	app.configure()
 
-	bail(app.Data.Connect())
+	db, err := sqlx.Connect("sqlite3", "dev.sqlite3")
+	if err != nil {
+		bail(err)
+	}
 
-	fileBuff, err := os.ReadFile(".minwebinternals/links.out.json")
-	bail(err)
+	bail(db.Ping())
 
-	json.Unmarshal(fileBuff, &app.Links)
+	app.DB = db
+	app.Links = app.fetchAllLinks()
 
 	app.Categories = GetCategories(app.Links)
 
@@ -71,14 +80,40 @@ func main() {
 
 	router.GET("/", IndexHandler(&app))
 	router.GET("/about", AboutHandler(&app))
-	router.GET("/login", LoginGetHandler(&app))
-	router.POST("/login", LoginPostHandler(&app))
 	router.GET("/admin", AdminGetHandler(&app))
 	router.GET("/category/:category", CategoryHandler(&app))
 	router.GET("/assets/*assetPath", AssetHandler(&app))
 
+	app.startWorkers()
+
 	fmt.Printf("Listening on %v\n", app.Port)
 	http.ListenAndServe(app.Port, router)
+}
+
+func (app *App) fetchAllLinks() []models.Links {
+	dbLinks := []models.Links{}
+
+	app.DB.Select(&dbLinks, `select id,title,link,category,image_url from links`)
+
+	return dbLinks
+}
+
+func (app *App) startWorkers() {
+	go app.seedLinks()
+
+	ticker := time.NewTicker(10 * time.Second)
+	quit := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				go app.refresh()
+			case <-quit:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
 }
 
 func (app *App) configure() {
@@ -111,7 +146,7 @@ func CategoryHandler(app *App) func(w http.ResponseWriter, r *http.Request, p ht
 			return
 		}
 
-		byCategory := []modules.LinkGroup{}
+		byCategory := []models.Links{}
 
 		for _, lg := range app.Links {
 			if lg.Category != category {
@@ -145,35 +180,6 @@ func AssetHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httpr
 	}
 }
 
-func LoginGetHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		app.Templates.ExecuteTemplate(w, "LoginPage", map[string]interface{}{
-			"LinkCount":  len(app.Links),
-			"Categories": app.Categories,
-		})
-	}
-}
-
-func LoginPostHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		r.ParseForm()
-		username := r.Form.Get("username")
-		password := r.Form.Get("password")
-
-		err := app.Data.Authenticate(username, password)
-
-		if err != nil {
-			// invalid credential
-			// Unauthenticated user
-			// Error Alerts to the templates
-			return
-		}
-
-		// Non-permanent redirect
-		http.Redirect(w, r, "/admin", http.StatusSeeOther)
-	}
-}
-
 func AdminGetHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		app.Templates.ExecuteTemplate(w, "AdminHome",
@@ -184,7 +190,7 @@ func AdminGetHandler(app *App) func(w http.ResponseWriter, r *http.Request, p ht
 	}
 }
 
-func GetCategories(links []modules.LinkGroup) Categories {
+func GetCategories(links []models.Links) Categories {
 	categoryMap := map[string]int{}
 	categories := Categories{
 		"all",
@@ -204,7 +210,7 @@ func GetCategories(links []modules.LinkGroup) Categories {
 	return categories
 }
 
-func FuzzyResult(search string, links []modules.LinkGroup) (result []modules.LinkGroup) {
+func FuzzyResult(search string, links []models.Links) (result []models.Links) {
 	if len(search) > 0 {
 		for _, lg := range links {
 			matchedTitle := fuzzy.Match(strings.ToLower(search), strings.ToLower(lg.Title))
@@ -218,4 +224,47 @@ func FuzzyResult(search string, links []modules.LinkGroup) (result []modules.Lin
 	}
 
 	return
+}
+
+func (app *App) refresh() {
+	app.Links = app.fetchAllLinks()
+
+	for _, linkItem := range app.Links {
+		newLink := modules.ParseMeta(linkItem.Link, linkItem.Title)
+
+		if newLink == linkItem.ImageURL {
+			continue
+		}
+
+		linkItem.ImageURL = newLink
+
+		_, err := app.DB.Exec(`update links set image_url = ? where id = ?`, linkItem.ImageURL, linkItem.ID)
+		if err != nil {
+			fmt.Printf("err: %v\n", err)
+			continue
+		}
+	}
+}
+
+func (app *App) seedLinks() {
+	fileBuff, _ := sourceData.ReadFile("links.json")
+	links := []models.Links{}
+	json.Unmarshal(fileBuff, &links)
+
+	for _, lg := range links {
+		dbLink := []models.Links{}
+		err := app.DB.Select(&dbLink, `select id,title,link,category from links where link=?`, lg.Link)
+		if err != nil {
+			fmt.Printf("err: %v\n", err)
+			continue
+		}
+		fmt.Printf("dbLink: %v\n", dbLink)
+
+		if len(dbLink) == 0 || dbLink[0].ID == 0 {
+			_, err := app.DB.Exec(`insert into links (title,link,category) values (?,?,?)`, lg.Title, lg.Link, lg.Category)
+			if err != nil {
+				log.Println("failed to insert", lg.Title, lg.Link, lg.Category)
+			}
+		}
+	}
 }

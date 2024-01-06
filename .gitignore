@@ -10,7 +10,9 @@ node_modules
 assets/css/tailwind.css
 assets/bundle
 
-
 .minwebinternals/*
 !.minwebinternals/.include
 
+*.sqlite3
+/models
+/tmp
