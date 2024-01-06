@@ -273,5 +273,30 @@
     "title": "Maggie Appleton",
     "link": "https://maggieappleton.com",
     "category": "personal"
+  },
+  {
+    "title": "Robbie Wagner",
+    "link": "https://robbiethewagner.dev",
+    "category": "personal"
+  },
+  {
+    "title": "Igor Bedesqui",
+    "link": "https://bedes.qui.gg",
+    "category": "personal"
+  },
+  {
+    "title": "LiveBlocks",
+    "link": "https://liveblocks.io",
+    "category": "company"
+  },
+  {
+    "title": "Are.na",
+    "link": "https://www.are.na",
+    "category": "company"
+  },
+  {
+    "title": "Dhruv Suthar",
+    "link": "https://dhrv.pw/",
+    "category": "personal"
   }
 ]
