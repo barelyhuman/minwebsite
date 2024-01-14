@@ -1,12 +1,19 @@
 include .env
 export
 
-setup:
-	go mod tidy
+APP_NAME="minweb"
+
+start:
+	PORT=${PORT} pm2 start 'node dist/server' --name=${APP_NAME} --update-env
+
+stop:
+	pm2 stop ${APP_NAME}
 
 deploy:
 	./.deploy/local-deploy
 
-dev:
-	go generate main.go
-	go run github.com/barelyhuman/gomon -w "." -exclude=".minwebinternals" .
+logs:
+	pm2 logs ${APP_NAME}
+
+kill:
+	pm2 del ${APP_NAME}
