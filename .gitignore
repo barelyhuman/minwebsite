@@ -1,16 +1,27 @@
-.DS_Store
-/minwebsite
-.env*
-!.env.example
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-*.out.json
 node_modules
+dist
+dist-ssr
+*.local
 
-# Generated on `go generate main.go`
-assets/css/tailwind.css
-assets/bundle
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-
-.minwebinternals/*
-!.minwebinternals/.include
-
+!.env.example
+.env*
