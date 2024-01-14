@@ -4,12 +4,40 @@ import { Header } from "../components/Header.js";
 import { reactive } from "@arrow-js/core";
 import { OGImage } from "../components/OGImage.js";
 
-import { createBento, masonry } from "../lib/masonry.js";
+import { createBento } from "../lib/masonry.js";
+
+let cachedLinkData = [];
+let lastFetched = null,
+  cacheStaleTime = null;
+
+const fetchData = async () => {
+  const data = await axios
+    .get(
+      "https://ungh.cc/repos/barelyhuman/minweb-public-data/files/main/links.json"
+    )
+    .catch((err) => []);
+  let result = [];
+  try {
+    result = JSON.parse(data.data.file.contents);
+  } catch (err) {}
+  cachedLinkData = result;
+  cacheStaleTime = Date.now() + 60 * 1000;
+  lastFetched = Date.now();
+  return result;
+};
 
 export const loader = async ({ req }) => {
-  const fetchData = await axios.get(
-    "https://ungh.cc/repos/barelyhuman/minweb-public-data/files/main/links.json"
-  );
+  let linkData = [];
+  if (!lastFetched) {
+    linkData = await fetchData();
+  } else {
+    if (Date.now() < cacheStaleTime) {
+      linkData = cachedLinkData;
+      console.log("using cache");
+    } else {
+      linkData = await fetchData();
+    }
+  }
 
   const searchTerm = req.query.q;
 
@@ -27,7 +55,7 @@ export const loader = async ({ req }) => {
 
   const categories = new Set();
   const normalisedST = (searchTerm && searchTerm.toLowerCase().trim()) || "";
-  const data = JSON.parse(fetchData.data.file.contents)
+  const data = linkData
     .map((d) => {
       categories.add(d.category);
       return d;
@@ -166,26 +194,28 @@ export default function Page({ query, data, categories, selectedCategories }) {
 
 function List({ data }) {
   return html` <div>
-    ${Object.keys(data).map((key) => {
-      const items = data[key];
+    ${Object.keys(data)
+      .sort()
+      .map((key) => {
+        const items = data[key];
 
-      return html`<div class="my-md">
-        <a href="#${key}" class="my-sm block"><h3 id="${key}">${key}</h3></a>
-        ${items.map((x) => {
-          return html`<r-grid columns="3">
-            <r-cell span="1" span-s="row">
-              <p>
-                <a class="no-underline" href="${x.link}">${x.title} </a>
-              </p>
-            </r-cell>
-            <r-cell span="1" span-s="row"></r-cell>
-            <r-cell span="1" span-s="1">
-              <p class="align-right text-dull">${x.category}</p>
-            </r-cell>
-          </r-grid>`;
-        })}
-      </div>`;
-    })}
+        return html`<div class="my-md">
+          <a href="#${key}" class="my-sm block"><h3 id="${key}">${key}</h3></a>
+          ${items.map((x) => {
+            return html`<r-grid columns="3">
+              <r-cell span="1" span-s="row">
+                <p>
+                  <a class="no-underline" href="${x.link}">${x.title} </a>
+                </p>
+              </r-cell>
+              <r-cell span="1" span-s="row"></r-cell>
+              <r-cell span="1" span-s="1">
+                <p class="align-right text-dull">${x.category}</p>
+              </r-cell>
+            </r-grid>`;
+          })}
+        </div>`;
+      })}
   </div>`;
 }
 
