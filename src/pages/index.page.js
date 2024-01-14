@@ -1,6 +1,10 @@
 import { html } from "@arrow-js/core";
 import axios from "axios";
-import { Header } from "../components/Header";
+import { Header } from "../components/Header.js";
+import { reactive } from "@arrow-js/core";
+import { OGImage } from "../components/OGImage.js";
+
+import { createBento, masonry } from "../lib/masonry.js";
 
 export const loader = async ({ req }) => {
   const fetchData = await axios.get(
@@ -66,6 +70,35 @@ export default function Page({ query, data, categories, selectedCategories }) {
     form.submit();
   };
 
+  const stateFromStorage = { showGrid: false };
+
+  if (typeof window !== "undefined") {
+    const itemState = localStorage.getItem("show_grid");
+
+    Object.assign(stateFromStorage, {
+      showGrid: itemState === "false" ? false : true,
+    });
+  }
+
+  const state = reactive(stateFromStorage);
+
+  if (state.showGrid) {
+    let id = setInterval(() => {
+      const bentoGrid = document.querySelector(".bento");
+      if (!bentoGrid) {
+        return;
+      }
+      createBento(bentoGrid);
+      clearInterval(id);
+    }, 500);
+  }
+
+  state.$on("showGrid", () => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("show_grid", state.showGrid);
+    }
+  });
+
   return html`
     <div>
       ${Header()}
@@ -104,30 +137,94 @@ export default function Page({ query, data, categories, selectedCategories }) {
         </div>
       </form>
 
-      <div>
-        ${Object.keys(data).map((key) => {
-          const items = data[key];
-
-          return html`<div class="my-md">
-            <a href="#${key}" class="my-sm block"
-              ><h3 id="${key}">${key}</h3></a
+      <r-grid columns="12">
+        <r-cell span="10"></r-cell>
+        <r-cell span="2">
+          <div class="flex items-center gap-sm">
+            <div>List</div>
+            <div
+              class="toggle"
+              @click="${(e) => {
+                state.showGrid = !state.showGrid;
+              }}"
             >
-            ${items.map((x) => {
-              return html`<r-grid columns="3">
-                <r-cell span="1" span-s="row">
-                  <p>
-                    <a class="no-underline" href="${x.link}">${x.title} </a>
-                  </p>
-                </r-cell>
-                <r-cell span="1" span-s="row"></r-cell>
-                <r-cell span="1" span-s="1">
-                  <p class="align-right text-dull">${x.category}</p>
-                </r-cell>
-              </r-grid>`;
-            })}
-          </div>`;
-        })}
-      </div>
+              <div class="line"></div>
+              <div
+                class="circle"
+                style="${() => (state.showGrid ? "left:50%" : "left:0%")}"
+              ></div>
+            </div>
+            <div>Grid</div>
+          </div>
+        </r-cell>
+      </r-grid>
     </div>
+
+    ${() => (!state.showGrid ? List({ data }) : Grid({ data }))}
   `;
+}
+
+function List({ data }) {
+  return html` <div>
+    ${Object.keys(data).map((key) => {
+      const items = data[key];
+
+      return html`<div class="my-md">
+        <a href="#${key}" class="my-sm block"><h3 id="${key}">${key}</h3></a>
+        ${items.map((x) => {
+          return html`<r-grid columns="3">
+            <r-cell span="1" span-s="row">
+              <p>
+                <a class="no-underline" href="${x.link}">${x.title} </a>
+              </p>
+            </r-cell>
+            <r-cell span="1" span-s="row"></r-cell>
+            <r-cell span="1" span-s="1">
+              <p class="align-right text-dull">${x.category}</p>
+            </r-cell>
+          </r-grid>`;
+        })}
+      </div>`;
+    })}
+  </div>`;
+}
+
+function Grid({ data }) {
+  const state = reactive({
+    gridLoaded: false,
+  });
+
+  let id = setInterval(async () => {
+    const bentoGrid = document.querySelector(".bento");
+    if (!bentoGrid) {
+      return;
+    }
+    await createBento(bentoGrid);
+    state.gridLoaded = true;
+    clearInterval(id);
+  }, 500);
+
+  const onlyData = Object.entries(data).reduce((acc, item) => {
+    return acc.concat(item[1]);
+  }, []);
+
+  return html` ${() =>
+      !state.gridLoaded
+        ? html`
+            <div>
+              <h3 class="text-dull">Filling a bento...</h3>
+            </div>
+          `
+        : ""}
+    <div class="my-md bento">
+      ${onlyData.map((x) => {
+        return html`
+          <div class="bento-item">
+            <a href="${x.link}" target="_blank">
+              ${() => OGImage({ title: x.title, link: x.link })}
+            </a>
+          </div>
+        `;
+      })}
+    </div>`;
 }
