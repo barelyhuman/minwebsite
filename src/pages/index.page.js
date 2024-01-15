@@ -13,7 +13,7 @@ let lastFetched = null,
 const fetchData = async () => {
   const data = await axios
     .get(
-      "https://ungh.cc/repos/barelyhuman/minweb-public-data/files/main/links.json"
+      "https://ungh.cc/repos/barelyhuman/minweb-public-data/files/main/data/links.json"
     )
     .catch((err) => []);
   let result = [];
