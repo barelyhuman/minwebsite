@@ -17,8 +17,8 @@ dependencies:
 
 devDependencies:
   adex:
-    specifier: ^0.0.1
-    version: 0.0.1(vite@5.0.0)
+    specifier: 0.0.2-beta.1
+    version: 0.0.2-beta.1(vite@5.0.0)
   axios:
     specifier: ^1.6.5
     version: 1.6.5
@@ -28,9 +28,6 @@ devDependencies:
   unfurl.js:
     specifier: ^6.3.2
     version: 6.3.2
-  vavite:
-    specifier: ^3.0.0
-    version: 3.0.0(vite@5.0.0)
   vite:
     specifier: 5.0.0
     version: 5.0.0
@@ -500,72 +497,8 @@ packages:
     dev: true
     optional: true
 
-  /@types/node@20.10.5:
-    resolution: {integrity: sha512-nNPsNE65wjMxEKI93yOP+NPGGBJz/PoN3kZsVLee0XMiJolxSekEVD8wRwBUBqkwc7UWop0edW50yrCQW4CyRw==}
-    dependencies:
-      undici-types: 5.26.5
-    dev: true
-
-  /@vavite/connect@3.0.0(vite@5.0.0):
-    resolution: {integrity: sha512-qTbxzuXlHiCHdeIa5PUaq3Xcj6mDAONZBzRCHY4NlHh0+9etG0Lb5yU2dwLdUvumqQaGKNljWMl5WCJ0pkOGEw==}
-    peerDependencies:
-      vite: ^2.8.1 || 3 || 4
-    dependencies:
-      '@types/node': 20.10.5
-      vite: 5.0.0
-    dev: true
-
-  /@vavite/expose-vite-dev-server@3.0.0(vite@5.0.0):
-    resolution: {integrity: sha512-rGqIIcVdZWSkGi4EK9qzFh/NdfFRWJogusPzAYf11lUN/q2IEEUujCWJ5YntufB+18HD3Gka7O+awzOTWC6vYg==}
-    peerDependencies:
-      vite: ^2.8.1 || 3 || 4
-    dependencies:
-      vite: 5.0.0
-    dev: true
-
-  /@vavite/multibuild-cli@3.0.0(vite@5.0.0):
-    resolution: {integrity: sha512-sZVSh8VFMORToLKwOVEut0Gj404gfBUXUTCntr1SiihDkpslKuHSrpDyLEQIJ0xiU12YrACZEQyVRRN1TDn4cw==}
-    hasBin: true
-    peerDependencies:
-      vite: ^2.8.1 || 3 || 4
-    dependencies:
-      '@types/node': 20.10.5
-      '@vavite/multibuild': 3.0.0(vite@5.0.0)
-      cac: 6.7.14
-      picocolors: 1.0.0
-      vite: 5.0.0
-    dev: true
-
-  /@vavite/multibuild@3.0.0(vite@5.0.0):
-    resolution: {integrity: sha512-RHNOP0j6Zka9fhZ5B9Y8+IWHA17CCCoGf2/p8sSew0tMCM1RdOBpR2vsL8s5gcSB96COi4Qkn4s9YwF4LhZHjg==}
-    peerDependencies:
-      vite: ^2.8.1 || 3 || 4
-    dependencies:
-      '@types/node': 20.10.5
-      cac: 6.7.14
-      picocolors: 1.0.0
-      vite: 5.0.0
-    dev: true
-
-  /@vavite/node-loader@3.0.0(vite@5.0.0):
-    resolution: {integrity: sha512-E14P6wP/u24TVxQGLyApOwhXamyYt9hX5EsqM0Vjd6tyE7Jiyt0XONNaotyt0DjXUJrLfFcbBfVyhr5aVEc73w==}
-    hasBin: true
-    peerDependencies:
-      vite: ^2.8.1 || 3 || 4
-    dependencies:
-      vite: 5.0.0
-    dev: true
-
-  /@vavite/reloader@3.0.0(vite@5.0.0):
-    resolution: {integrity: sha512-mgyLbsH+XTuGp/mQ9GbgKBV5Q9QK0IEVdVNcH72TSiaqtIbqc5b3hdpEyf1GncYzZ0S/96YdmuU7SCJWiBYHeQ==}
-    peerDependencies:
-      vite: ^2.8.1 || 3 || 4
-    dependencies:
-      vite: 5.0.0
-    dev: true
-
-  /adex@0.0.1(vite@5.0.0):
-    resolution: {integrity: sha512-gxoDvMyz4402ezAYU38Za7XOix8O23/oKjWvKLZ6lVcTmw/EQ1d0aGqUccWmx1Jhvo67f1eqTNw0C0qMFjWoOQ==}
+  /adex@0.0.2-beta.1(vite@5.0.0):
+    resolution: {integrity: sha512-ovhgbq9U/VWOz1X6fE7lbr9TOdUTEmhx9lYXgSeq05DqaJo+yHTVBcClqUEXhtT+KaceVAIpb7tE+iMlMoqTZA==}
     hasBin: true
     peerDependencies:
       vite: ^5.0.10
@@ -581,7 +514,6 @@ packages:
       ora: 8.0.1
       path-to-regexp: 6.2.1
       sirv: 2.0.4
-      vavite: 3.0.0(vite@5.0.0)
       vite: 5.0.0
       youch: 3.3.3
     transitivePeerDependencies:
@@ -626,11 +558,6 @@ packages:
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
-    dev: true
-
-  /cac@6.7.14:
-    resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
-    engines: {node: '>=8'}
     dev: true
 
   /chalk@2.4.2:
@@ -1168,10 +1095,6 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /undici-types@5.26.5:
-    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
-    dev: true
-
   /unfurl.js@6.3.2:
     resolution: {integrity: sha512-F2oC3nc/p/ARgAghuScaPQMds95S/hLZwjdhZiYhQDGvwc67V4rkiLuLyatlb14I3scO40rVMGzRiC8OTEKPkQ==}
     engines: {node: '>=6.0.0'}
@@ -1184,23 +1107,6 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
-    dev: true
-
-  /vavite@3.0.0(vite@5.0.0):
-    resolution: {integrity: sha512-3v77cZD78LYhT3M5zEQ+TKXdKQcKVV1DRAqYLOLTrB5n8Jq0bmz1vvBQH6PSvFFfhi+2S3hCjs4ekNzBCxvC4w==}
-    hasBin: true
-    peerDependencies:
-      vite: ^2.8.1 || 3 || 4
-    dependencies:
-      '@vavite/connect': 3.0.0(vite@5.0.0)
-      '@vavite/expose-vite-dev-server': 3.0.0(vite@5.0.0)
-      '@vavite/multibuild': 3.0.0(vite@5.0.0)
-      '@vavite/multibuild-cli': 3.0.0(vite@5.0.0)
-      '@vavite/node-loader': 3.0.0(vite@5.0.0)
-      '@vavite/reloader': 3.0.0(vite@5.0.0)
-      cac: 6.7.14
-      picocolors: 1.0.0
-      vite: 5.0.0
     dev: true
 
   /vite@5.0.0:
