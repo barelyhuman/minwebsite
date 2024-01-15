@@ -9,6 +9,6 @@ const content = marked(
 export default function Page() {
   return html`
     ${Header()}
-    <article class="prose my-lg">${content}</article>
+    <article class="prose my-xl">${content}</article>
   `;
 }
