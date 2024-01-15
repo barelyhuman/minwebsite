@@ -1,4 +1,31 @@
-export async function createBento(gridContainer, maxCols = 3, gap = 16) {
+export function createBento(gridContainer, maxCols = 3, gap = 16) {
+  for (let child of gridContainer.children) {
+    const img = child.querySelector("img");
+    if (img.naturalHeight > 0) {
+      // already loaded image
+      continue;
+    }
+
+    img.addEventListener("load", (evt) => {
+      debouncedRelocate(gridContainer, maxCols, gap);
+    });
+  }
+  debouncedRelocate(gridContainer, maxCols, gap);
+}
+
+const debounce = (fn, delay) => {
+  let id;
+  return (...args) => {
+    if (id) clearTimeout(id);
+    id = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+};
+
+const debouncedRelocate = debounce(relocate, 550);
+
+function relocate(gridContainer, maxCols = 3, gap = 16) {
   const windowWidth = window.innerWidth;
   if (windowWidth < 640) {
     maxCols = 1;
@@ -26,9 +53,10 @@ export async function createBento(gridContainer, maxCols = 3, gap = 16) {
       }
       const col = cols[colIndex];
       const img = col.querySelector("img");
-      const dimensions = await getImageNaturalDimensions(img);
+      const dimensions = getImageNaturalDimensions(img);
       const expectedWidth = elemWidth;
       const expectedHeight = elemWidth * dimensions.ratio;
+
       let prevLeft = expectedPositions[rowIndex][colIndex - 1];
       let prevTop;
       if (rowIndex > 0) {
@@ -80,58 +108,24 @@ export async function createBento(gridContainer, maxCols = 3, gap = 16) {
     height: lastElem.top + lastElem.height + "px",
   });
   gridContainer.classList.remove("grid");
+  gridContainer.classList.add("relative");
+
   gridContainer.style.opacity = 1;
-  gridContainer.classList.add("bento-loaded");
 }
 
 /**
  * @param {HTMLImageElement} img
  * @returns
  */
-async function getImageNaturalDimensions(img) {
-  if (img.naturalHeight > 0) {
-    return {
-      height: img.naturalHeight,
-      width: img.naturalWidth,
-      ratio: img.naturalHeight / img.naturalWidth,
-    };
-  }
-
-  let promise, resolve;
-
-  const validURL = await fetch(img.src)
-    .then((x) => x.ok)
-    .catch((err) => false);
-
-  if (!validURL) {
-    const title = img.getAttribute("alt");
-    img.src =
-      "https://og.barelyhuman.xyz/generate?fontSize=14&backgroundColor=%23121212&title=" +
-      title +
-      "&fontSizeTwo=8&color=%23efefef";
-  }
-
-  promise = new Promise((_resolve) => {
-    resolve = _resolve;
-  });
-
-  img.addEventListener("load", (evt) => {
-    resolve({
-      height: evt.target.naturalHeight,
-      width: evt.target.naturalWidth,
-      ratio: evt.target.naturalHeight / evt.target.naturalWidth,
-    });
-  });
-
-  // img.addEventListener("error", (evt) => {
-  //   const title = img.getAttribute("alt");
-  //   img.src =
-  //     "https://og.barelyhuman.xyz/generate?fontSize=14&backgroundColor=%23121212&title=" +
-  //     title +
-  //     "&fontSizeTwo=8&color=%23efefef";
-  // });
-
-  return promise;
+function getImageNaturalDimensions(img) {
+  const height = img.naturalHeight || 0;
+  const width = img.naturalWidth || 0;
+  const ratio = height / width;
+  return {
+    height,
+    width,
+    ratio: isNaN(ratio) ? 0 : ratio,
+  };
 }
 
 function removeLoader() {
@@ -139,4 +133,12 @@ function removeLoader() {
   if (loader) {
     loader.parentNode.removeChild(loader);
   }
+}
+
+function getFallbackURL(title) {
+  return (
+    "https://og.barelyhuman.xyz/generate?fontSize=14&backgroundColor=%23121212&title=" +
+    title +
+    "&fontSizeTwo=8&color=%23efefef"
+  );
 }

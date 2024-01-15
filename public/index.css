@@ -223,17 +223,17 @@ input[type="checkbox"]:checked::before {
 }
 
 .bento .bento-item {
-  visibility: hidden;
   border-radius: 6px;
   overflow: hidden;
+  width: calc(100% / 3);
+  transition: all 250ms ease-in-out;
 }
 
-.bento.bento-loaded {
+.bento {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   position: relative;
-}
-
-.bento.bento-loaded .bento-item {
-  visibility: visible;
 }
 
 .og-image {

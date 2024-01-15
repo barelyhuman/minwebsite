@@ -110,17 +110,6 @@ export default function Page({ query, data, categories, selectedCategories }) {
 
   const state = reactive(stateFromStorage);
 
-  if (state.showGrid) {
-    let id = setInterval(() => {
-      const bentoGrid = document.querySelector(".bento");
-      if (!bentoGrid) {
-        return;
-      }
-      createBento(bentoGrid);
-      clearInterval(id);
-    }, 500);
-  }
-
   state.$on("showGrid", () => {
     if (typeof window !== "undefined") {
       localStorage.setItem("show_grid", state.showGrid);
@@ -220,17 +209,12 @@ function List({ data }) {
 }
 
 function Grid({ data }) {
-  const state = reactive({
-    gridLoaded: false,
-  });
-
   let id = setInterval(async () => {
     const bentoGrid = document.querySelector(".bento");
     if (!bentoGrid) {
       return;
     }
-    await createBento(bentoGrid);
-    state.gridLoaded = true;
+    createBento(bentoGrid);
     clearInterval(id);
   }, 500);
 
@@ -238,23 +222,15 @@ function Grid({ data }) {
     return acc.concat(item[1]);
   }, []);
 
-  return html` ${() =>
-      !state.gridLoaded
-        ? html`
-            <div>
-              <h3 class="text-dull">Filling a bento...</h3>
-            </div>
-          `
-        : ""}
-    <div class="my-md bento">
-      ${onlyData.map((x) => {
-        return html`
-          <div class="bento-item">
-            <a href="${x.link}" target="_blank">
-              ${() => OGImage({ title: x.title, link: x.link })}
-            </a>
-          </div>
-        `;
-      })}
-    </div>`;
+  return html` <div class="my-md bento">
+    ${onlyData.map((x) => {
+      return html`
+        <div class="bento-item">
+          <a href="${x.link}" target="_blank">
+            ${() => OGImage({ title: x.title, link: x.link })}
+          </a>
+        </div>
+      `;
+    })}
+  </div>`;
 }
