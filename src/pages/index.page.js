@@ -155,8 +155,8 @@ export default function Page({ query, data, categories, selectedCategories }) {
       </form>
 
       <r-grid columns="12">
-        <r-cell span="10"></r-cell>
-        <r-cell span="2">
+        <r-cell span="10" span-s=row></r-cell>
+        <r-cell span="2" span-s=row>
           <div class="flex items-center gap-sm">
             <div>List</div>
             <div
