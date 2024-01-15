@@ -155,8 +155,8 @@ export default function Page({ query, data, categories, selectedCategories }) {
       </form>
 
       <r-grid columns="12">
-        <r-cell span="10" span-s=row></r-cell>
-        <r-cell span="2" span-s=row>
+        <r-cell span="10" span-s="row"></r-cell>
+        <r-cell span="2" span-s="row">
           <div class="flex items-center gap-sm">
             <div>List</div>
             <div
@@ -227,7 +227,8 @@ function Grid({ data }) {
       return html`
         <div class="bento-item">
           <a href="${x.link}" target="_blank">
-            ${() => OGImage({ title: x.title, link: x.link })}
+            ${() =>
+              OGImage({ title: x.title, imageURL: x.imageURL })}
           </a>
         </div>
       `;
