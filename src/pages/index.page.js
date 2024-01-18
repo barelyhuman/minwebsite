@@ -19,10 +19,10 @@ const fetchData = async () => {
   let result = [];
   try {
     result = JSON.parse(data.data.file.contents);
+    cachedLinkData = result;
+    cacheStaleTime = Date.now() + 60 * 1000;
+    lastFetched = Date.now();
   } catch (err) {}
-  cachedLinkData = result;
-  cacheStaleTime = Date.now() + 60 * 1000;
-  lastFetched = Date.now();
   return result;
 };
 
@@ -75,6 +75,7 @@ export const loader = async ({ req }) => {
     .reduce((acc, item) => {
       const key = item.title.toLowerCase().charAt(0);
       (acc[key] || (acc[key] = [])).push(item);
+      acc[key].sort((x, y) => x.title.localeCompare(y.title));
       return acc;
     }, {});
 
@@ -227,8 +228,7 @@ function Grid({ data }) {
       return html`
         <div class="bento-item">
           <a href="${x.link}" target="_blank">
-            ${() =>
-              OGImage({ title: x.title, imageURL: x.imageURL })}
+            ${() => OGImage({ title: x.title, imageURL: x.imageURL })}
           </a>
         </div>
       `;
