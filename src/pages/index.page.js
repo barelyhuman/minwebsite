@@ -85,15 +85,24 @@ export const loader = async ({ req }) => {
     query.searchTerm = searchTerm;
   }
 
+  const count = linkData.length;
+
   return {
     query,
     data,
+    count,
     selectedCategories,
     categories: Array.from(categories),
   };
 };
 
-export default function Page({ query, data, categories, selectedCategories }) {
+export default function Page({
+  query,
+  data,
+  count,
+  categories,
+  selectedCategories,
+}) {
   const onChange = (e, category) => {
     const form = e.target.closest("form");
     form.submit();
@@ -120,6 +129,7 @@ export default function Page({ query, data, categories, selectedCategories }) {
   return html`
     <div>
       ${Header()}
+      <p class="text-dull">Collection: ${count}</p>
 
       <form method="GET">
         <div>
