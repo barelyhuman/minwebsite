@@ -12,6 +12,7 @@ APP_NAME="minweb"
 PORT="4532"
 
 COMMANDS="""
+set -euxo pipefail
 mkdir -p ${APP_DIR}
 cd ${APP_DIR}
 . ~/.nvm/nvm.sh
@@ -26,6 +27,6 @@ make kill
 make start
 """
 
-rsync -aP --exclude=".git" --exclude="node_modules" --exclude=".env" --exclude="dist" ./ "${DEPLOY_HOST}:${APP_DIR}"
+rsync -aP --delete --exclude=".git" --exclude="node_modules" --exclude=".env" --exclude="dist" ./ "${DEPLOY_HOST}:${APP_DIR}"
 
-ssh "${DEPLOY_HOST}" "/bin/bash -c '$COMMANDS'"
+ssh $DEPLOY_HOST "/bin/bash -c '$COMMANDS'"
