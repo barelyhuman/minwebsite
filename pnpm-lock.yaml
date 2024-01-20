@@ -17,8 +17,8 @@ dependencies:
 
 devDependencies:
   adex:
-    specifier: 0.0.2-beta.2
-    version: 0.0.2-beta.2(vite@5.0.0)
+    specifier: 0.0.2-beta.5
+    version: 0.0.2-beta.5(vite@5.0.0)
   axios:
     specifier: ^1.6.5
     version: 1.6.5
@@ -497,8 +497,8 @@ packages:
     dev: true
     optional: true
 
-  /adex@0.0.2-beta.2(vite@5.0.0):
-    resolution: {integrity: sha512-bk3vFWEoXagXtQqtk/Rka1WWT5JaeKlHsK5b/3jvaDRU6WdIt6lUKFRYH0lUMXfBYWTpEnZQDJgViqcUjE6YVw==}
+  /adex@0.0.2-beta.5(vite@5.0.0):
+    resolution: {integrity: sha512-+EW5c5dz1STpBBKKUohDBU8El+w0GP9jynT3B1siZJjdWVQKUHLDPbGQttaT2jW8aW6lo5nSzM0clQSDtc93cQ==}
     hasBin: true
     peerDependencies:
       vite: ^5.0.10

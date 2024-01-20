@@ -221,18 +221,21 @@ input[type="checkbox"]:checked::before {
   background: var(--primary-color);
 }
 
-.bento .bento-item {
-  border-radius: 6px;
-  overflow: hidden;
-  width: calc(100% / 3);
-  transition: all 250ms ease-in-out;
-}
-
 .bento {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   position: relative;
+  gap: 10px;
+}
+
+.bento .bento-item {
+  border-radius: 6px;
+  overflow: hidden;
+  width: calc(100% / 3 - 15px);
+  transition: all 250ms ease-in-out;
+  min-height: 150px;
+  background: #adb5bd;
 }
 
 .og-image {
