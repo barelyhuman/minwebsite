@@ -1,9 +1,9 @@
 import { html } from "@arrow-js/core";
 import axios from "axios";
-import { Header } from "../components/Header.js";
-import { reactive } from "@arrow-js/core";
 import { OGImage } from "../components/OGImage.js";
 
+import { BaseLayout } from "../layouts/base.js";
+import { initLazyLoader } from "../lib/lazy-loader.js";
 import { createBento } from "../lib/masonry.js";
 
 let cachedLinkData = [];
@@ -33,7 +33,6 @@ export const loader = async ({ req }) => {
   } else {
     if (Date.now() < cacheStaleTime) {
       linkData = cachedLinkData;
-      console.log("using cache");
     } else {
       linkData = await fetchData();
     }
@@ -60,7 +59,7 @@ export const loader = async ({ req }) => {
       categories.add(d.category);
       return d;
     })
-    .sort((x, y) => x.title.toLowerCase() < y.title.toLowerCase())
+    .sort((x, y) => x.title.toLowerCase() > y.title.toLowerCase())
     .filter((x) => {
       if (!searchTerm) return x;
       return (
@@ -71,13 +70,7 @@ export const loader = async ({ req }) => {
     .filter((x) => {
       if (selectedCategories.length == 0) return true;
       return selectedCategories.includes(x.category);
-    })
-    .reduce((acc, item) => {
-      const key = item.title.toLowerCase().charAt(0);
-      (acc[key] || (acc[key] = [])).push(item);
-      acc[key].sort((x, y) => x.title.localeCompare(y.title));
-      return acc;
-    }, {});
+    });
 
   const query = {};
 
@@ -108,88 +101,90 @@ export default function Page({
     form.submit();
   };
 
-  const stateFromStorage = { showGrid: false };
-
-  if (typeof window !== "undefined") {
-    const itemState = localStorage.getItem("show_grid");
-
-    Object.assign(stateFromStorage, {
-      showGrid: itemState === "false" ? false : true,
-    });
-  }
-
-  const state = reactive(stateFromStorage);
-
-  state.$on("showGrid", () => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("show_grid", state.showGrid);
+  let id = setInterval(async () => {
+    if (typeof window === "undefined") return;
+    const bentoGrid = document.querySelector(".bento");
+    if (!bentoGrid) {
+      return;
     }
-  });
+    createBento(bentoGrid, 4, 0);
+    initLazyLoader();
+    clearInterval(id);
+  }, 500);
 
-  return html`
-    <div>
-      ${Header()}
-      <p class="text-dull">Collection: ${count}</p>
-
-      <form method="GET">
-        <div>
-          <input
-            class="search-input"
-            placeholder="search"
-            type="text"
-            name="q"
-            value="${query.searchTerm}"
-          />
-        </div>
-        <div>
-          <r-grid columns="12" class="my-md">
-            ${categories.map((x) => {
-              const checked = selectedCategories.includes(x) ? "checked" : "";
-              return html`
-                <r-cell span="2">
-                  <label class="form-control">
-                    <input
-                      type="checkbox"
-                      name="category"
-                      value="${x}"
-                      class="mx-sm"
-                      @change="${(e) => onChange(e, x)}"
-                      ${checked}
-                    />
-                    ${x}
-                  </label>
-                </r-cell>
-              `;
-            })}
-          </r-grid>
-        </div>
-      </form>
-
-      <r-grid columns="12">
-        <r-cell span="10" span-s="row"></r-cell>
-        <r-cell span="2" span-s="row">
-          <div class="flex items-center gap-sm">
-            <div>List</div>
-            <div
-              class="toggle"
-              @click="${(e) => {
-                state.showGrid = !state.showGrid;
-              }}"
-            >
-              <div class="line"></div>
-              <div
-                class="circle"
-                style="${() => (state.showGrid ? "left:50%" : "left:0%")}"
-              ></div>
-            </div>
-            <div>Grid</div>
+  return BaseLayout({
+    children: html`
+      <div class="flex w-full">
+        <div
+          class="bento grid w-full sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4"
+        >
+          <div class="p-5 h-[320px] overflow-hidden">
+            <nav class="text-zinc-400">
+              <h1 class="text-zinc-600 text-xl mb-5">MW</h1>
+              <form>
+                <div class="mb-3">
+                  <input
+                    type="text"
+                    class="px-2 py-1 m-0 focus:outline-none ring-0 text-xs border bg-transparent rounded-[6px] border-zinc-700"
+                    placeholder="search"
+                    value="${query.searchTerm}"
+                    name="q"
+                  />
+                </div>
+                <ul class="text-sm">
+                  <a href="/about" class="text-zinc-400 hover:text-zinc-100">
+                    <li>About</li>
+                  </a>
+                  <li class="mt-2">
+                    <div class="flex flex-col gap-2">
+                      <p>Categories</p>
+                      <div class="ml-3">
+                        ${categories.map(
+                          (x) => html`
+                            <label class="my-3 flex gap-2 items-center">
+                              <input
+                                type="checkbox"
+                                class="rounded-md bg-zinc-900 checked:bg-lime-400 focus:bg-lime-400"
+                                @change="${onChange}"
+                                checked="${() =>
+                                  selectedCategories.includes(x)}"
+                                value="${x}"
+                                name="category"
+                              />
+                              <div>
+                                <span>${x}</span>
+                              </div>
+                            </label>
+                          `
+                        )}
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </form>
+            </nav>
           </div>
-        </r-cell>
-      </r-grid>
-    </div>
-
-    ${() => (!state.showGrid ? List({ data }) : Grid({ data }))}
-  `;
+          ${data
+            .sort((x, y) => x.title.toLowerCase() > y.title.toLowerCase())
+            .map((tile) => {
+              return html`<a href="${tile.link}">
+                <div class="group hover:cursor-pointer relative">
+                  <img
+                    src="/image-placeholder.svg"
+                    data-src="${tile.imageURL}"
+                  />
+                  <div
+                    class="group-hover:block hidden absolute bottom-2 left-2 px-3 py-1 text-xs rounded-sm bg-black text-white"
+                  >
+                    <p>${tile.title}</p>
+                  </div>
+                </div>
+              </a>`;
+            })}
+        </div>
+      </div>
+    `,
+  });
 }
 
 function List({ data }) {

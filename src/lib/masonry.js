@@ -1,16 +1,17 @@
 export function createBento(gridContainer, maxCols = 3, gap = 16) {
+  relocate(gridContainer, maxCols, gap);
   for (let child of gridContainer.children) {
     const img = child.querySelector("img");
-    if (img.naturalHeight > 0) {
-      // already loaded image
-      continue;
-    }
+    if (!img) continue;
 
     img.addEventListener("load", (evt) => {
       debouncedRelocate(gridContainer, maxCols, gap);
     });
+
+    if (img.naturalHeight > 0) {
+      continue;
+    }
   }
-  debouncedRelocate(gridContainer, maxCols, gap);
 }
 
 const debounce = (fn, delay) => {
@@ -30,11 +31,18 @@ function relocate(gridContainer, maxCols = 3, gap = 16) {
   if (windowWidth < 640) {
     maxCols = 1;
   } else if (windowWidth < 768) {
-    maxCols -= 1;
+    maxCols -= 2;
+  }
+
+  if (maxCols == 0) {
+    maxCols = 1;
   }
 
   const gridBox = gridContainer.getBoundingClientRect();
   const elemWidth = Math.ceil(gridBox.width / maxCols) - gap;
+  if (elemWidth === 0) {
+    debugger;
+  }
 
   const rows = Array.from(gridContainer.children).reduce((arr, item, idx) => {
     return idx % maxCols === 0
@@ -53,9 +61,15 @@ function relocate(gridContainer, maxCols = 3, gap = 16) {
       }
       const col = cols[colIndex];
       const img = col.querySelector("img");
-      const dimensions = getImageNaturalDimensions(img);
-      const expectedWidth = elemWidth;
-      const expectedHeight = elemWidth * dimensions.ratio;
+
+      let dimensions = getElementDimensions(col);
+      let expectedWidth = dimensions.width;
+      let expectedHeight = dimensions.height;
+      if (img) {
+        dimensions = getImageNaturalDimensions(img);
+        expectedWidth = elemWidth;
+        expectedHeight = elemWidth * dimensions.ratio;
+      }
 
       let prevLeft = expectedPositions[rowIndex][colIndex - 1];
       let prevTop;
@@ -71,12 +85,13 @@ function relocate(gridContainer, maxCols = 3, gap = 16) {
       if (!prevLeft) {
         prevLeft = {
           left: -(expectedWidth + gap / 2),
+          width: expectedWidth,
         };
       }
 
       expectedPositions[rowIndex][colIndex] = {
         elem: col,
-        left: prevLeft.left + gap + expectedWidth,
+        left: prevLeft.left + gap + prevLeft.width,
         top: prevTop.top + gap + prevTop.height,
         height: expectedHeight,
         width: expectedWidth,
@@ -95,21 +110,26 @@ function relocate(gridContainer, maxCols = 3, gap = 16) {
         height: vDom.height + "px",
       });
 
-      if (!lastElem) {
+      if (!lastElem && vDom.top > 0) {
         lastElem = vDom;
       }
+
+      if (!vDom.top) return;
+
       if (vDom.top + vDom.height > lastElem.top + lastElem.height) {
         lastElem = vDom;
       }
     });
   });
 
-  Object.assign(gridContainer.style, {
-    height: lastElem.top + lastElem.height + "px",
-  });
-  gridContainer.classList.remove("grid");
-  gridContainer.classList.add("relative");
+  if (lastElem) {
+    Object.assign(gridContainer.style, {
+      height: lastElem.top + lastElem.height + "px",
+    });
+  }
 
+  gridContainer.style.display = "block";
+  gridContainer.style.position = "relative";
   gridContainer.style.opacity = 1;
 }
 
@@ -141,4 +161,14 @@ function getFallbackURL(title) {
     title +
     "&fontSizeTwo=8&color=%23efefef"
   );
+}
+
+function getElementDimensions(elm) {
+  const box = elm.getBoundingClientRect();
+  const ratio = box.height / box.width;
+  return {
+    height: box.height,
+    width: box.width,
+    ratio: isNaN(ratio) ? 0 : ratio,
+  };
 }

@@ -7,7 +7,17 @@ export function OGImage({ title, imageURL } = {}) {
       title +
       "&fontSizeTwo=8&color=%23efefef";
 
-    return html`<img class="og-image" src="${fallbackImage}" alt="${title}" />`;
+    return html`<img
+      loading="lazy"
+      class="og-image"
+      src="${fallbackImage}"
+      alt="${title}"
+    />`;
   }
-  return html`<img class="og-image" src="${imageURL}" alt="${title}" />`;
+  return html`<img
+    loading="lazy"
+    class="og-image"
+    src="${imageURL}"
+    alt="${title}"
+  />`;
 }
