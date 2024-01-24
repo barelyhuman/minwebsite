@@ -131,11 +131,17 @@ export default function Page({
                     name="q"
                   />
                 </div>
-                <ul class="text-sm">
+                <ul class="text-sm flex flex-col gap-[8px]">
                   <a href="/about" class="text-zinc-400 hover:text-zinc-100">
                     <li>About</li>
                   </a>
-                  <li class="mt-2">
+                  <a
+                    href="https://github.com/barelyhuman/minweb-public-data#add-another-site"
+                    class="text-zinc-400 hover:text-zinc-100"
+                  >
+                    <li>Submit a site?</li>
+                  </a>
+                  <li>
                     <div class="flex flex-col gap-2">
                       <p>Categories</p>
                       <div class="ml-3">
