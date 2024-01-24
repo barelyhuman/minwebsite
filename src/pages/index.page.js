@@ -144,7 +144,7 @@ export default function Page({
                             <label class="my-3 flex gap-2 items-center">
                               <input
                                 type="checkbox"
-                                class="rounded-md bg-zinc-900 checked:bg-lime-400 focus:bg-lime-400"
+                                class="rounded-md bg-zinc-900 checked:bg-lime-400 hover:checked:bg-lime-400 focus:bg-lime-400"
                                 @change="${onChange}"
                                 checked="${() =>
                                   selectedCategories.includes(x)}"
