@@ -173,7 +173,7 @@ export default function Page({
           ${data
             .sort((x, y) => x.title.toLowerCase() > y.title.toLowerCase())
             .map((tile) => {
-              return html`<a href="${tile.link}">
+              return html`<a href="${tile.link}" class="transition-all duration-300">
                 <div class="group hover:cursor-pointer relative">
                   <img
                     src="/image-placeholder.svg"
