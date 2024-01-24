@@ -1,5 +1,10 @@
 export function createBento(gridContainer, maxCols = 3, gap = 16) {
   relocate(gridContainer, maxCols, gap);
+
+  window.addEventListener("resize", () => {
+    relocate(gridContainer, maxCols, gap);
+  });
+
   for (let child of gridContainer.children) {
     const img = child.querySelector("img");
     if (!img) continue;
