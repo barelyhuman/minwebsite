@@ -45,9 +45,6 @@ function relocate(gridContainer, maxCols = 3, gap = 16) {
 
   const gridBox = gridContainer.getBoundingClientRect();
   const elemWidth = Math.ceil(gridBox.width / maxCols) - gap;
-  if (elemWidth === 0) {
-    debugger;
-  }
 
   const rows = Array.from(gridContainer.children).reduce((arr, item, idx) => {
     return idx % maxCols === 0
