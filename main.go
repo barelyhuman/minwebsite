@@ -1,221 +1,130 @@
-//go:generate npm run build
-//go:generate go run ./bin/prepare.go
-
 package main
 
 import (
+	"bytes"
+	"context"
 	"embed"
 	"encoding/json"
+	"flag"
 	"fmt"
-	"html/template"
+	"io"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
-
-	modules "github.com/barelyhuman/minwebsite/modules"
-	"github.com/lithammer/fuzzysearch/fuzzy"
+	"time"
 
 	"github.com/barelyhuman/go/env"
-	"github.com/joho/godotenv"
-	"github.com/julienschmidt/httprouter"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
-//go:embed templates/*.html templates/**/*.html assets/*
-var sourceData embed.FS
-
-func bail(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
-type Categories []string
-
-type RenderResponse struct {
-	Links      []modules.LinkGroup
-	LinkCount  int
-	Categories Categories
-}
-
-type App struct {
-	Port       string
-	Templates  *template.Template
-	Links      []modules.LinkGroup
-	Categories Categories
-	FileServer http.Handler
-	Data       Data
-}
+//go:embed all:client/dist
+var StaticFiles embed.FS
 
 func main() {
-	app := App{}
-	app.configure()
+	e := echo.New()
 
-	bail(app.Data.Connect())
+	devMode := flag.Bool("dev", false, "Enable dev mode")
+	flag.Parse()
 
-	fileBuff, err := os.ReadFile(".minwebinternals/links.out.json")
-	bail(err)
-
-	json.Unmarshal(fileBuff, &app.Links)
-
-	app.Categories = GetCategories(app.Links)
-
-	router := httprouter.New()
-
-	app.Templates, err = template.ParseFS(sourceData, "templates/**/*.html")
-	bail(err)
-
-	app.Templates, err = app.Templates.ParseFS(sourceData, "templates/*.html")
-	bail(err)
-
-	app.FileServer = http.FileServer(http.FS(sourceData))
-
-	router.GET("/", IndexHandler(&app))
-	router.GET("/about", AboutHandler(&app))
-	router.GET("/login", LoginGetHandler(&app))
-	router.POST("/login", LoginPostHandler(&app))
-	router.GET("/admin", AdminGetHandler(&app))
-	router.GET("/category/:category", CategoryHandler(&app))
-	router.GET("/assets/*assetPath", AssetHandler(&app))
-
-	fmt.Printf("Listening on %v\n", app.Port)
-	http.ListenAndServe(app.Port, router)
-}
-
-func (app *App) configure() {
-	godotenv.Load()
-	port := env.Get("PORT", "3000")
-	app.Port = strings.Join([]string{":", port}, "")
-}
-
-func IndexHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		search := r.URL.Query().Get("q")
-
-		links := FuzzyResult(search, app.Links)
-
-		app.Templates.ExecuteTemplate(w, "Index", RenderResponse{
-			Links:      links,
-			LinkCount:  len(links),
-			Categories: app.Categories,
+	if !*devMode {
+		distFS := echo.MustSubFS(StaticFiles, "client/dist")
+		e.StaticFS("/", distFS)
+	} else {
+		e.GET("/", func(c echo.Context) error {
+			c.Redirect(http.StatusSeeOther, "http://localhost:5173/")
+			return nil
 		})
 	}
-}
 
-func CategoryHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		category := p.ByName("category")
-		search := r.URL.Query().Get("q")
+	e.Pre(middleware.RemoveTrailingSlash())
 
-		if category == "all" {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
+	e.GET("/api/links", func(c echo.Context) error {
+		var data LinksJSON
+		var buf bytes.Buffer
+		var linkData []LinkItem
 
-		byCategory := []modules.LinkGroup{}
-
-		for _, lg := range app.Links {
-			if lg.Category != category {
-				continue
-			}
-			byCategory = append(byCategory, lg)
-		}
-
-		byCategory = FuzzyResult(search, byCategory)
-
-		app.Templates.ExecuteTemplate(w, "Index", RenderResponse{
-			Links:      byCategory,
-			LinkCount:  len(byCategory),
-			Categories: app.Categories,
-		})
-	}
-}
-
-func AboutHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		app.Templates.ExecuteTemplate(w, "About", map[string]interface{}{
-			"LinkCount":  len(app.Links),
-			"Categories": app.Categories,
-		})
-	}
-}
-
-func AssetHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		app.FileServer.ServeHTTP(w, r)
-	}
-}
-
-func LoginGetHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		app.Templates.ExecuteTemplate(w, "LoginPage", map[string]interface{}{
-			"LinkCount":  len(app.Links),
-			"Categories": app.Categories,
-		})
-	}
-}
-
-func LoginPostHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		r.ParseForm()
-		username := r.Form.Get("username")
-		password := r.Form.Get("password")
-
-		err := app.Data.Authenticate(username, password)
+		response, err := http.Get("https://ungh.cc/repos/barelyhuman/minweb-public-data/files/main/data/links.json")
 
 		if err != nil {
-			// invalid credential
-			// Unauthenticated user
-			// Error Alerts to the templates
-			return
+			fmt.Printf("err: %v\n", err)
+			return c.JSON(http.StatusOK, "{}")
 		}
 
-		// Non-permanent redirect
-		http.Redirect(w, r, "/admin", http.StatusSeeOther)
-	}
-}
+		io.Copy(&buf, response.Body)
+		json.Unmarshal(buf.Bytes(), &data)
+		json.Unmarshal([]byte(data.File.Contents), &linkData)
 
-func AdminGetHandler(app *App) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		app.Templates.ExecuteTemplate(w, "AdminHome",
-			map[string]interface{}{
-				"LinkCount":  len(app.Links),
-				"Categories": app.Categories,
-			})
-	}
-}
+		filtered := []LinkItem{}
+		categories := c.Request().URL.Query()["category"]
+		searchTerm := strings.ToLower(c.QueryParam("q"))
 
-func GetCategories(links []modules.LinkGroup) Categories {
-	categoryMap := map[string]int{}
-	categories := Categories{
-		"all",
-	}
+		allCategories := NewSet()
 
-	for _, i := range links {
-		if categoryMap[i.Category] > 0 {
-			continue
-		}
-		categoryMap[i.Category] = 1
-	}
+		for _, item := range linkData {
+			allCategories.Add(item.Category)
 
-	for key := range categoryMap {
-		categories = append(categories, key)
-	}
+			isItemInCategory := false
 
-	return categories
-}
+			if len(categories) == 0 {
+				isItemInCategory = true
+			}
 
-func FuzzyResult(search string, links []modules.LinkGroup) (result []modules.LinkGroup) {
-	if len(search) > 0 {
-		for _, lg := range links {
-			matchedTitle := fuzzy.Match(strings.ToLower(search), strings.ToLower(lg.Title))
-			matchedLink := fuzzy.Match(strings.ToLower(search), strings.ToLower(lg.Link))
-			if matchedTitle || matchedLink {
-				result = append(result, lg)
+			for _, v := range categories {
+				if strings.Contains(strings.ToLower(v), strings.ToLower(item.Category)) {
+					isItemInCategory = true
+				}
+			}
+
+			if len(searchTerm) == 0 {
+				if isItemInCategory {
+					filtered = append(filtered, item)
+				}
+			} else {
+				titleLower := strings.ToLower(item.Title)
+				linkLower := strings.ToLower(item.Link)
+				matchesSearch := (strings.Contains(titleLower, searchTerm) || strings.Contains(linkLower, searchTerm))
+				if matchesSearch && isItemInCategory {
+					filtered = append(filtered, item)
+				}
 			}
 		}
-	} else {
-		result = links
-	}
 
-	return
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"data":       filtered,
+			"categories": allCategories.JSON(),
+		})
+	})
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+	go func() {
+		port := env.Get("PORT", "3000")
+		if err := e.Start(":" + port); err != nil && err != http.ErrServerClosed {
+			e.Logger.Fatal("shutting down the server")
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
+	<-ctx.Done()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
+	}
+}
+
+type LinkItem struct {
+	Title           string `json:"title"`
+	Link            string `json:"link"`
+	Category        string `json:"category"`
+	ImageURL        string `json:"imageURL"`
+	BackgroundColor string `json:"backgroundColor"`
+}
+
+type LinksJSON struct {
+	File struct {
+		Contents string
+	}
 }

@@ -1,16 +1,14 @@
 .DS_Store
-/minwebsite
-.env*
-!.env.example
 
-*.out.json
+# Node
 node_modules
 
-# Generated on `go generate main.go`
-assets/css/tailwind.css
-assets/bundle
+# Artifacts
+dist
 
+# binaries
+app
 
-.minwebinternals/*
-!.minwebinternals/.include
-
+# env files
+.env*
+!.env.example
