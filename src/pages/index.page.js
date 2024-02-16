@@ -80,6 +80,8 @@ export const loader = async ({ req }) => {
 
   const count = linkData.length;
 
+  
+
   return {
     query,
     data,
@@ -116,9 +118,9 @@ export default function Page({
     children: html`
       <div class="flex w-full">
         <div
-          class="bento grid w-full sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4"
+          class="bento min-h-[90vh] grid w-full sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4"
         >
-          <div class="p-5 h-[320px] overflow-hidden">
+          <div class="p-5 h-auto overflow-hidden">
             <nav class="text-zinc-400">
               <h1 class="text-zinc-600 text-xl mb-5">MW</h1>
               <form>
@@ -173,10 +175,14 @@ export default function Page({
           ${data
             .sort((x, y) => x.title.toLowerCase() > y.title.toLowerCase())
             .map((tile) => {
-              return html`<a href="${tile.link}" class="transition-all duration-300">
-                <div class="group hover:cursor-pointer relative">
+              return html`<a
+                href="${tile.link}"
+                class="transition-all duration-300 min-h-[150px]"
+              >
+                <div class="group hover:cursor-pointer relative w-full h-full">
                   <img
-                    src="/image-placeholder.svg"
+                    class="border-0 w-full h-full"
+                    style="background:${tile.backgroundColor}"
                     data-src="${tile.imageURL}"
                   />
                   <div

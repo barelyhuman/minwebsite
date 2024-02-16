@@ -31,11 +31,11 @@ const debounce = (fn, delay) => {
 
 const debouncedRelocate = debounce(relocate, 550);
 
-function relocate(gridContainer, maxCols = 3, gap = 16) {
+export async function relocate(gridContainer, maxCols = 3, gap = 16) {
   const windowWidth = window.innerWidth;
-  if (windowWidth < 640) {
+  if (windowWidth <= 640) {
     maxCols = 1;
-  } else if (windowWidth < 768) {
+  } else if (windowWidth < 1050) {
     maxCols -= 2;
   }
 
@@ -67,7 +67,8 @@ function relocate(gridContainer, maxCols = 3, gap = 16) {
       let dimensions = getElementDimensions(col);
       let expectedWidth = dimensions.width;
       let expectedHeight = dimensions.height;
-      if (img) {
+
+      if (img && img.lazyLoaded) {
         dimensions = getImageNaturalDimensions(img);
         expectedWidth = elemWidth;
         expectedHeight = elemWidth * dimensions.ratio;
@@ -110,6 +111,7 @@ function relocate(gridContainer, maxCols = 3, gap = 16) {
         left: vDom.left + "px",
         width: vDom.width + "px",
         height: vDom.height + "px",
+        minHeight: vDom.height + "px",
       });
 
       if (!lastElem && vDom.top > 0) {

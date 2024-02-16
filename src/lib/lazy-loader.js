@@ -6,12 +6,16 @@ export function initLazyLoader() {
   function lazyLoad() {
     const toLoad = document.querySelectorAll("[data-src]");
     for (const elm of toLoad) {
-      if (elm.lazyLoaded == true) continue;
+      if (elm.lazyLoaded === true) continue;
 
       const box = elm.getBoundingClientRect();
       if (box.top <= window.screenTop + window.innerHeight) {
-        elm.src = elm.dataset.src;
-        elm.lazyLoaded = true;
+        const img = new Image();
+        img.addEventListener("load", () => {
+          elm.src = elm.dataset.src;
+          elm.lazyLoaded = true;
+        });
+        img.src = elm.dataset.src;
       }
     }
   }
