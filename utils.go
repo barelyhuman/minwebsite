@@ -28,6 +28,6 @@ func (s *StringSet) Delete(item string) {
 	s = &newS
 }
 
-func NewSet() *StringSet {
+func NewStringSet() *StringSet {
 	return &StringSet{}
 }
