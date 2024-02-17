@@ -2,7 +2,8 @@ export function createBento (gridContainer, maxCols = 3, gap = 16) {
   relocate(gridContainer, maxCols, gap)
 
   window.addEventListener('resize', () => {
-    relocate(gridContainer, maxCols, gap)
+    console.log("resized");
+    debouncedRelocate(gridContainer, maxCols, gap)
   })
 
   for (const child of gridContainer.children) {
