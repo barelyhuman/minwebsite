@@ -53,10 +53,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			io.Copy(w, file)
 			return
 		}
-		path = filepath.Join(path, "index.html")
 	}
-
-	fmt.Printf("path: %v\n", path)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -81,7 +78,7 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-
+	fmt.Printf("Starting Server on: %v\n", "http://localhost:"+port)
 	log.Fatal(srv.ListenAndServe())
 }
 
@@ -94,7 +91,12 @@ func LinksHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
-		// return c.JSON(http.StatusOK, "{}")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"total":      0,
+			"data":       []LinkItem{},
+			"categories": []string{},
+		})
+		return
 	}
 
 	io.Copy(&buf, response.Body)
