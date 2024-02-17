@@ -5,6 +5,7 @@ import { Layout } from '../components/layout'
 import { relocate as alignBento, resetBento } from '../lib/bento'
 
 const data = signal([])
+const total = signal(0)
 const categories = signal([])
 
 fetchLinks()
@@ -14,6 +15,7 @@ async function fetchLinks () {
     const response = await fetch('/api/links?' + sp.toString()).json()
     categories.value = response.categories
     data.value = response.data
+    total.value = response.total
   } catch (err) {
     console.error(err)
   }
@@ -67,6 +69,9 @@ export default function HomePage () {
                   >
                     <li>Submit a site?</li>
                   </a>
+                  <li class='pt-2 border-t border-zinc-500'>
+                    Total: {total}
+                  </li>
                   <li>
                     <div class='flex flex-col gap-2'>
                       <p>Categories</p>

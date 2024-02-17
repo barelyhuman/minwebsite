@@ -92,6 +92,7 @@ func main() {
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
+			"total":      len(linkData),
 			"data":       filtered,
 			"categories": allCategories.JSON(),
 		})
