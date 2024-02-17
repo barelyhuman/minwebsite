@@ -3,7 +3,7 @@ import { Layout } from '../components/layout.jsx'
 export default function AboutPage () {
   return (
     <Layout>
-      <div class='m-10'>
+      <div class='m-10 flex flex-col'>
         <h1 class='font-semibold'>About</h1>
         <p>
           <a href='https://minweb.site' class='text-zinc-600 hover:text-zinc-100'>

@@ -1,6 +1,6 @@
 import { effect, signal } from '@preact/signals'
 import fetch from '@webreflection/fetch'
-import { useLocation, useSearch } from 'wouter-preact'
+import { Link, useLocation, useSearch } from 'wouter-preact'
 import { Layout } from '../components/layout'
 import { relocate as alignBento, resetBento } from '../lib/bento'
 
@@ -8,7 +8,10 @@ const data = signal([])
 const total = signal(0)
 const categories = signal([])
 
-fetchLinks()
+if (typeof window !== 'undefined') {
+  fetchLinks()
+}
+
 async function fetchLinks () {
   const sp = new URLSearchParams(window.location.search)
   try {
@@ -60,18 +63,16 @@ export default function HomePage () {
                   />
                 </div>
                 <ul class='text-sm flex flex-col gap-[8px]'>
-                  <a href='/about' class='text-zinc-400 hover:text-zinc-100'>
+                  <Link href='/about' class='text-zinc-400 hover:text-zinc-100'>
                     <li>About</li>
-                  </a>
+                  </Link>
                   <a
                     href='https://github.com/barelyhuman/minweb-public-data#add-another-site'
                     class='text-zinc-400 hover:text-zinc-100'
                   >
                     <li>Submit a site?</li>
                   </a>
-                  <li class='pt-2 border-t border-zinc-500'>
-                    Total: {total}
-                  </li>
+                  <li class='pt-2 border-t border-zinc-500'>Total: {total}</li>
                   <li>
                     <div class='flex flex-col gap-2'>
                       <p>Categories</p>

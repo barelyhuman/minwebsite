@@ -15,7 +15,11 @@ export default defineConfig({
   },
   plugins: [
     preact({
-      prerender: true
+      prerender: {
+        enabled: true,
+        renderTarget: '#root',
+        additionalPrerenderRoutes: ['/about']
+      }
     })
   ]
 })

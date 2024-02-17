@@ -2,21 +2,20 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"embed"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io"
+	"io/fs"
+	"log"
 	"net/http"
 	"os"
-	"os/signal"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/barelyhuman/go/env"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/gorilla/mux"
 )
 
 type LinkItem struct {
@@ -36,48 +35,57 @@ type LinksJSON struct {
 //go:embed all:client/dist
 var StaticFiles embed.FS
 
-func main() {
-	e := echo.New()
-
-	devMode := flag.Bool("dev", false, "Enable dev mode")
-	flag.Parse()
-
-	if !*devMode {
-		distFS := echo.MustSubFS(StaticFiles, "client/dist")
-		e.StaticFS("/", distFS)
-		e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-			Root:  "client/dist",
-			Index: "index.html",
-			HTML5: true,
-		}))
-	} else {
-		e.GET("/", func(c echo.Context) error {
-			c.Redirect(http.StatusSeeOther, "http://localhost:5173/")
-			return nil
-		})
-	}
-
-	e.Pre(middleware.RemoveTrailingSlash())
-	e.GET("/api/links", LinksHandler)
-
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer stop()
-	go func() {
-		port := env.Get("PORT", "3000")
-		if err := e.Start(":" + port); err != nil && err != http.ErrServerClosed {
-			e.Logger.Fatal("shutting down the server")
-		}
-	}()
-
-	<-ctx.Done()
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := e.Shutdown(ctx); err != nil {
-		e.Logger.Fatal(err)
-	}
+type spaHandler struct {
+	fileSystem fs.FS
+	staticPath string
+	indexPath  string
 }
 
-func LinksHandler(c echo.Context) error {
+func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	path := filepath.Join(h.staticPath, r.URL.Path)
+	fi, err := fs.Stat(h.fileSystem, path)
+	subFs, _ := fs.Sub(h.fileSystem, h.staticPath)
+
+	if os.IsNotExist(err) || fi.IsDir() {
+		fi, err := fs.Stat(h.fileSystem, filepath.Join(path, "index.html"))
+		if os.IsNotExist(err) || fi.IsDir() {
+			file, _ := subFs.Open(h.indexPath)
+			io.Copy(w, file)
+			return
+		}
+		path = filepath.Join(path, "index.html")
+	}
+
+	fmt.Printf("path: %v\n", path)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.FileServer(http.FS(subFs)).ServeHTTP(w, r)
+}
+
+func main() {
+	router := mux.NewRouter()
+
+	router.HandleFunc("/api/links", LinksHandler)
+
+	spa := spaHandler{fileSystem: StaticFiles, staticPath: "client/dist", indexPath: "index.html"}
+
+	router.PathPrefix("/").Handler(spa)
+	port := env.Get("PORT", "3000")
+	srv := &http.Server{
+		Handler:      router,
+		Addr:         "127.0.0.1:" + port,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	log.Fatal(srv.ListenAndServe())
+}
+
+func LinksHandler(w http.ResponseWriter, r *http.Request) {
 	var data LinksJSON
 	var buf bytes.Buffer
 	var linkData []LinkItem
@@ -86,7 +94,7 @@ func LinksHandler(c echo.Context) error {
 
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
-		return c.JSON(http.StatusOK, "{}")
+		// return c.JSON(http.StatusOK, "{}")
 	}
 
 	io.Copy(&buf, response.Body)
@@ -94,8 +102,13 @@ func LinksHandler(c echo.Context) error {
 	json.Unmarshal([]byte(data.File.Contents), &linkData)
 
 	filtered := []LinkItem{}
-	categories := c.Request().URL.Query()["category"]
-	searchTerm := strings.ToLower(c.QueryParam("q"))
+	categories := r.URL.Query()["category"]
+	q := r.URL.Query()["q"]
+
+	searchTerm := ""
+	if len(q) > 0 {
+		searchTerm = strings.ToLower(q[0])
+	}
 
 	allCategories := NewStringSet()
 
@@ -128,9 +141,10 @@ func LinksHandler(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	json.NewEncoder(w).Encode(map[string]interface{}{
 		"total":      len(linkData),
 		"data":       filtered,
 		"categories": allCategories.JSON(),
 	})
+
 }

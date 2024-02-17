@@ -22,6 +22,7 @@
     "@preact/signals": "^1.2.2",
     "@webreflection/fetch": "^0.1.4",
     "preact": "^10.19.4",
+    "preact-render-to-string": "^6.3.1",
     "wouter-preact": "^3.0.0"
   }
 }

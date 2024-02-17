@@ -1,18 +1,44 @@
 import './main.css'
 
-import { render } from 'preact'
-import { Route, Switch } from 'wouter-preact'
+import { hydrate } from 'preact'
+import { Route, Router, Switch } from 'wouter-preact'
 import HomePage from './pages/home.page.jsx'
 import AboutPage from './pages/about.page.jsx'
+import renderToString from 'preact-render-to-string'
 
-const App = () => (
+const App = (props) => (
   <>
-    <Switch>
-      <Route path='/about' component={AboutPage} />
-      <Route path='/' component={HomePage} />
-      <Route>404: No such page!</Route>
-    </Switch>
+    <Router ssrPath={props.url}>
+      <Switch>
+        <Route path='/about' component={AboutPage} />
+        <Route path='/' component={HomePage} />
+        <Route default>404: No such page!</Route>
+      </Switch>
+    </Router>
   </>
 )
 
-render(<App />, document.getElementById('root'))
+if (typeof window !== 'undefined') {
+  hydrate(<App />, document.getElementById('root'))
+}
+
+export async function prerender (data) {
+  const maxDepth = 10
+  let tries = 0
+
+  const render = () => {
+    if (++tries > maxDepth) return
+    try {
+      return renderToString(<App {...data} />)
+    } catch (e) {
+      if (e && e.then) return e.then(render)
+      throw e
+    }
+  }
+
+  try {
+    const result = await render()
+    console.log('\n' + result)
+    return result
+  } catch {}
+}
