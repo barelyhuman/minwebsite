@@ -45,6 +45,11 @@ func main() {
 	if !*devMode {
 		distFS := echo.MustSubFS(StaticFiles, "client/dist")
 		e.StaticFS("/", distFS)
+		e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+			Root:  "client/dist",
+			Index: "index.html",
+			HTML5: true,
+		}))
 	} else {
 		e.GET("/", func(c echo.Context) error {
 			c.Redirect(http.StatusSeeOther, "http://localhost:5173/")
