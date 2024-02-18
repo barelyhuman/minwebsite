@@ -1,8 +1,10 @@
+const modified = new Set()
+
 export function createBento (gridContainer, maxCols = 3, gap = 16) {
   relocate(gridContainer, maxCols, gap)
 
   window.addEventListener('resize', () => {
-    console.log("resized");
+    resetBento(gridContainer)
     debouncedRelocate(gridContainer, maxCols, gap)
   })
 
@@ -40,7 +42,7 @@ export async function relocate (gridContainer, maxCols = 3, gap = 16) {
     maxCols -= 2
   }
 
-  if (maxCols == 0) {
+  if (maxCols === 0) {
     maxCols = 1
   }
 
@@ -106,6 +108,7 @@ export async function relocate (gridContainer, maxCols = 3, gap = 16) {
   let lastElem
   expectedPositions.forEach((rows) => {
     rows.forEach((vDom) => {
+      modified.add(vDom)
       Object.assign(vDom.elem.style, {
         position: 'absolute',
         top: vDom.top + 'px',
@@ -142,12 +145,21 @@ export function resetBento (container) {
   container.style.display = 'grid'
   container.style.position = 'static'
   container.style.opacity = 1
+  for (const item of modified) {
+    if (!(item.elm && item.elm.style)) continue
+    delete item.elm.style.position
+    delete item.elm.style.top
+    delete item.elm.style.left
+    delete item.elm.style.width
+    delete item.elm.style.height
+    delete item.elm.style.minHeight
+  }
 }
 
 /**
-   * @param {HTMLImageElement} img
-   * @returns
-   */
+ * @param {HTMLImageElement} img
+ * @returns
+ */
 function getImageNaturalDimensions (img) {
   const height = img.naturalHeight || 0
   const width = img.naturalWidth || 0
