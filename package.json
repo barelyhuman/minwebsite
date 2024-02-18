@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite dev"
+    "dev": "vite dev",
+    "fix":"standard --fix ."
   },
   "keywords": [],
   "author": "",
