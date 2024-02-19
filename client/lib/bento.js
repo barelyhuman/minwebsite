@@ -1,182 +1,158 @@
-const modified = new Set()
+export const debouncedBento = debounce(createBento, 350)
+export const debouncedRelocate = debounce(relocate, 350)
 
-export function createBento (gridContainer, maxCols = 3, gap = 16) {
-  relocate(gridContainer, maxCols, gap)
-
-  window.addEventListener('resize', () => {
-    resetBento(gridContainer)
-    debouncedRelocate(gridContainer, maxCols, gap)
+export async function createBento (gridContainer, maxCols = 3, gap = 16) {
+  window.addEventListener('resize', function () {
+    debouncedRelocate(gridContainer, maxCols, gap, true)
   })
-
-  for (const child of gridContainer.children) {
-    const img = child.querySelector('img')
-    if (!img) continue
-
-    img.addEventListener('load', (evt) => {
-      debouncedRelocate(gridContainer, maxCols, gap)
-    })
-
-    if (img.naturalHeight > 0) {
-      continue
-    }
-  }
+  await debouncedRelocate(gridContainer, maxCols, gap)
 }
 
-const debounce = (fn, delay) => {
+async function relocate (gridContainer, maxCols = 3, gap = 16, reset = false) {
+  if (reset) {
+    resetGrid(gridContainer)
+  }
+
+  const gridBox = gridContainer.getBoundingClientRect()
+  const usableGridWidth = gridBox.width - gap * maxCols
+  const minWidth = 327
+  const cols = Math.floor(usableGridWidth / minWidth)
+
+  // Only reduce, do not increase the value
+  if (cols < maxCols) {
+    maxCols = cols
+  }
+
+  const expectedWidth = usableGridWidth / maxCols
+
+  for (
+    let childIndex = 0;
+    childIndex < gridContainer.children.length;
+    childIndex += 1
+  ) {
+    const child = gridContainer.children[childIndex]
+    child.style.visibility = 'hidden'
+    const img = child.querySelector('img')
+    if (img && img.src) {
+      const alreadyLoaded = loadImage(img)
+      if (alreadyLoaded instanceof Promise) {
+        await alreadyLoaded
+      } else {
+        child.style.opacity = 1
+      }
+    }
+    const boxPosition = childIndex + 1
+    const row = Math.ceil(boxPosition / maxCols)
+    const prevTopIndex = boxPosition - maxCols
+    const prevTopRow = Math.ceil(prevTopIndex / maxCols)
+    const prevLeftIndex = boxPosition - 1
+    const prevLeftRow = Math.ceil(prevLeftIndex / maxCols)
+
+    let prevLeft
+    let prevTop
+
+    if (prevLeftRow === row) {
+      prevLeft = gridContainer.children[prevLeftIndex - 1]
+    }
+
+    if (prevTopRow < row) {
+      prevTop = gridContainer.children[prevTopIndex - 1]
+    }
+
+    const style = {
+      top: 0 + gap / 2 + 'px',
+      left: 0 + gap / 2 + 'px'
+    }
+
+    if (img && img.src) {
+      const ratio = img.naturalHeight / img.naturalWidth
+      style.height = expectedWidth * ratio + 'px'
+      style.minHeight = expectedWidth * ratio + 'px'
+      style.width = expectedWidth + 'px'
+    } else {
+      style.height = expectedWidth * 0.525 + 'px'
+      style.minHeight = expectedWidth * 0.525 + 'px'
+      style.width = expectedWidth + 'px'
+    }
+
+    if (prevTop) {
+      const topBox = prevTop.getBoundingClientRect()
+      const topPosition =
+          +prevTop.style.top.replace('px', '') + topBox.height + gap + 'px'
+      style.top = topPosition
+    }
+
+    if (prevLeft) {
+      const leftBox = prevLeft.getBoundingClientRect()
+      const leftPosition =
+          +prevLeft.style.left.replace('px', '') + leftBox.width + gap + 'px'
+      style.left = leftPosition
+    }
+
+    Object.assign(child.style, {
+      ...style,
+      position: 'absolute',
+      visibility: 'visible',
+      opacity: 1
+    })
+  }
+
+  gridContainer.style.height = '0px'
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(function () {
+      let totalHeight = 0
+      let rows = 0
+      const children = Array.from(gridContainer.children)
+      for (let i = 0; i < gridContainer.children.length; i += maxCols) {
+        rows += 1
+
+        const rowItems = children.slice(i, rows * maxCols)
+        const maxHeight = Math.max(...rowItems.map(x => x.getBoundingClientRect().height))
+        totalHeight += maxHeight
+      }
+
+      totalHeight += rows * gap
+
+      Object.assign(gridContainer.style, {
+        position: 'relative',
+        height: totalHeight + 'px',
+        minHeight: totalHeight + 'px'
+      })
+    })
+  })
+}
+
+function debounce (fn, delay) {
   let id
   return (...args) => {
-    if (id) clearTimeout(id)
+    if (id) {
+      clearTimeout(id)
+    }
     id = setTimeout(() => {
       fn(...args)
     }, delay)
   }
 }
 
-const debouncedRelocate = debounce(relocate, 550)
-
-export async function relocate (gridContainer, maxCols = 3, gap = 16) {
-  const windowWidth = window.innerWidth
-  if (windowWidth <= 640) {
-    maxCols = 1
-  } else if (windowWidth < 1050) {
-    maxCols -= 2
-  }
-
-  if (maxCols === 0) {
-    maxCols = 1
-  }
-
-  const gridBox = gridContainer.getBoundingClientRect()
-  const elemWidth = Math.ceil(gridBox.width / maxCols) - gap
-
-  const rows = Array.from(gridContainer.children).reduce((arr, item, idx) => {
-    return idx % maxCols === 0
-      ? [...arr, [item]]
-      : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]]
-  }, [])
-
-  const expectedPositions = []
-
-  for (const rowIndex in rows) {
-    expectedPositions[rowIndex] = []
-    const cols = rows[rowIndex]
-    for (const colIndex in cols) {
-      if (!expectedPositions[rowIndex][colIndex]) {
-        expectedPositions[rowIndex][colIndex] = {}
-      }
-      const col = cols[colIndex]
-      const img = col.querySelector('img')
-
-      let dimensions = getElementDimensions(col)
-      let expectedWidth = dimensions.width
-      let expectedHeight = dimensions.height
-
-      if (img && img.loaded) {
-        dimensions = getImageNaturalDimensions(img)
-        expectedWidth = elemWidth
-        expectedHeight = elemWidth * dimensions.ratio
-      }
-
-      let prevLeft = expectedPositions[rowIndex][colIndex - 1]
-      let prevTop
-      if (rowIndex > 0) {
-        prevTop = expectedPositions[rowIndex - 1][colIndex]
-      } else {
-        prevTop = {
-          top: -expectedHeight,
-          height: expectedHeight
-        }
-      }
-
-      if (!prevLeft) {
-        prevLeft = {
-          left: -(expectedWidth + gap / 2),
-          width: expectedWidth
-        }
-      }
-
-      expectedPositions[rowIndex][colIndex] = {
-        elem: col,
-        left: prevLeft.left + gap + prevLeft.width,
-        top: prevTop.top + gap + prevTop.height,
-        height: expectedHeight,
-        width: expectedWidth
-      }
-    }
-  }
-
-  let lastElem
-  expectedPositions.forEach((rows) => {
-    rows.forEach((vDom) => {
-      modified.add(vDom)
-      Object.assign(vDom.elem.style, {
-        position: 'absolute',
-        top: vDom.top + 'px',
-        left: vDom.left + 'px',
-        width: vDom.width + 'px',
-        height: vDom.height + 'px',
-        minHeight: vDom.height + 'px'
-      })
-
-      if (!lastElem && vDom.top > 0) {
-        lastElem = vDom
-      }
-
-      if (!vDom.top) return
-
-      if (vDom.top + vDom.height > lastElem.top + lastElem.height) {
-        lastElem = vDom
-      }
+async function loadImage (img) {
+  if (img.naturalHeight > 0) return true
+  return new Promise((resolve) => {
+    img.addEventListener('load', function () {
+      resolve(true)
     })
   })
+}
 
-  if (lastElem) {
-    Object.assign(gridContainer.style, {
-      height: lastElem.top + lastElem.height + 'px'
+function resetGrid (grid) {
+  grid.style.position = 'static'
+  grid.style.display = 'grid'
+  Array.from(grid.children).forEach(child => {
+    Object.assign(child.style, {
+      top: undefined,
+      position: 'static',
+      left: undefined,
+      width: undefined,
+      height: undefined
     })
-  }
-
-  gridContainer.style.display = 'block'
-  gridContainer.style.position = 'relative'
-  gridContainer.style.opacity = 1
-}
-
-export function resetBento (container) {
-  container.style.display = 'grid'
-  container.style.position = 'static'
-  container.style.opacity = 1
-  for (const item of modified) {
-    if (!(item.elm && item.elm.style)) continue
-    delete item.elm.style.position
-    delete item.elm.style.top
-    delete item.elm.style.left
-    delete item.elm.style.width
-    delete item.elm.style.height
-    delete item.elm.style.minHeight
-  }
-}
-
-/**
- * @param {HTMLImageElement} img
- * @returns
- */
-function getImageNaturalDimensions (img) {
-  const height = img.naturalHeight || 0
-  const width = img.naturalWidth || 0
-  const ratio = height / width
-  return {
-    height,
-    width,
-    ratio: isNaN(ratio) ? 0 : ratio
-  }
-}
-
-function getElementDimensions (elm) {
-  const box = elm.getBoundingClientRect()
-  const ratio = box.height / box.width
-  return {
-    height: box.height,
-    width: box.width,
-    ratio: isNaN(ratio) ? 0 : ratio
-  }
+  })
 }
