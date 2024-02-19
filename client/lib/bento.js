@@ -8,9 +8,9 @@ export async function createBento (gridContainer, maxCols = 3, gap = 16) {
   await debouncedRelocate(gridContainer, maxCols, gap)
 }
 
-async function relocate (gridContainer, maxCols = 3, gap = 16, reset = false) {
-  if (reset) {
-    resetGrid(gridContainer)
+async function relocate (gridContainer, maxCols = 3, gap = 16, resize = false) {
+  if (resize) {
+    await resetGrid(gridContainer)
   }
 
   const gridBox = gridContainer.getBoundingClientRect()
@@ -31,7 +31,7 @@ async function relocate (gridContainer, maxCols = 3, gap = 16, reset = false) {
     childIndex += 1
   ) {
     const child = gridContainer.children[childIndex]
-    child.style.visibility = 'hidden'
+    child.style.opacity = 0
     const img = child.querySelector('img')
     if (img && img.src) {
       const alreadyLoaded = loadImage(img)
@@ -97,29 +97,31 @@ async function relocate (gridContainer, maxCols = 3, gap = 16, reset = false) {
     })
   }
 
-  gridContainer.style.height = '0px'
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(function () {
-      let totalHeight = 0
-      let rows = 0
-      const children = Array.from(gridContainer.children)
-      for (let i = 0; i < gridContainer.children.length; i += maxCols) {
-        rows += 1
+  let totalHeight = 0
+  let rows = 0
+  const children = Array.from(gridContainer.children)
+  for (let i = 0; i < gridContainer.children.length; i += maxCols) {
+    rows += 1
 
-        const rowItems = children.slice(i, rows * maxCols)
-        const maxHeight = Math.max(...rowItems.map(x => x.getBoundingClientRect().height))
-        totalHeight += maxHeight
-      }
+    const rowItems = children.slice(i, rows * maxCols)
+    const maxHeight = Math.max(...rowItems.map(x => x.getBoundingClientRect().height))
+    totalHeight += maxHeight
+  }
 
-      totalHeight += rows * gap
+  totalHeight += rows * gap
 
-      Object.assign(gridContainer.style, {
-        position: 'relative',
-        height: totalHeight + 'px',
-        minHeight: totalHeight + 'px'
-      })
-    })
+  Object.assign(gridContainer.style, {
+    position: 'relative',
+    display: 'block',
+    height: totalHeight + 'px',
+    minHeight: totalHeight + 'px'
   })
+
+  gridContainer.classList.remove('grid')
+  gridContainer.classList.remove('sm:grid-cols-1')
+  gridContainer.classList.remove('md:grid-cols-3')
+  gridContainer.classList.remove('lg:grid-cols-4')
+  gridContainer.classList.remove('gap-2')
 }
 
 function debounce (fn, delay) {
@@ -143,16 +145,23 @@ async function loadImage (img) {
   })
 }
 
-function resetGrid (grid) {
+async function resetGrid (grid) {
   grid.style.position = 'static'
   grid.style.display = 'grid'
   Array.from(grid.children).forEach(child => {
     Object.assign(child.style, {
-      top: undefined,
       position: 'static',
-      left: undefined,
-      width: undefined,
-      height: undefined
+      height: 'auto',
+      minHeight: 'auto',
+      width: 'auto'
+    })
+  })
+  // Wait for browser to paint
+  await new Promise((resolve) => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        resolve()
+      })
     })
   })
 }
