@@ -17,7 +17,15 @@ async function fetchLinks () {
   try {
     const response = await fetch('/api/links?' + sp.toString()).json()
     categories.value = response.categories
-    data.value = response.data
+    data.value = response.data.map(d => {
+      if (d.imageURL.startsWith('https://og.barelyhuman.xyz')) {
+        const url = new URL(d.imageURL)
+        url.searchParams.set('backgroundColor', '181819')
+        d.imageURL = url.toString()
+        d.backgroundColor = 'rgb(25,25,25)'
+      }
+      return d
+    })
     total.value = response.total
   } catch (err) {
     console.error(err)
@@ -117,9 +125,9 @@ export default function HomePage () {
                 <a
                   key={tile.link}
                   href={tile.link}
-                  class='transition-all opacity-0 duration-200 min-h-[150px] rounded-lg overflow-hidden'
+                  class='group transition-all opacity-0 duration-200 min-h-[150px] rounded-lg overflow-hidden scale-100 hover:scale-110 hover:z-10'
                 >
-                  <div class='group hover:cursor-pointer relative w-full h-full'>
+                  <div class='hover:cursor-pointer relative w-full h-full'>
                     <img
                       class='border-0 w-full h-full'
                       style={`background:${tile.backgroundColor}`}
@@ -133,7 +141,7 @@ export default function HomePage () {
                         img.src = node.dataset.src
                       }}
                     />
-                    <div class='absolute bottom-2 left-2 px-3 py-1 text-xs rounded-sm bg-black text-white'>
+                    <div class='group-hover:hidden absolute bottom-2 left-2 px-3 py-1 text-xs rounded-sm bg-black supports-[backdrop-filter]:bg-black/75 supports-[backdrop-filter]:backdrop-blur-md text-white'>
                       <p>{tile.title}</p>
                     </div>
                   </div>
