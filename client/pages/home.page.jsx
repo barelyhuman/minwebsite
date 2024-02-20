@@ -125,7 +125,7 @@ export default function HomePage () {
                 <a
                   key={tile.link}
                   href={tile.link}
-                  class='group transition-all opacity-0 duration-200 min-h-[150px] rounded-lg overflow-hidden scale-100 hover:scale-110 hover:z-10'
+                  class='group transition-all opacity-0 duration-200 min-h-[150px] rounded-lg overflow-hidden scale-100 hover:scale-[115%] hover:z-10'
                 >
                   <div class='hover:cursor-pointer relative w-full h-full'>
                     <img
