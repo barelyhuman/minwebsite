@@ -5,6 +5,15 @@ export async function createBento (gridContainer, maxCols = 3, gap = 16) {
   window.addEventListener('resize', function () {
     debouncedRelocate(gridContainer, maxCols, gap, true)
   })
+
+  Array.from(gridContainer.querySelectorAll('img')).forEach((img) => {
+    if (img.naturalHeight > 0) return
+
+    img.addEventListener('load', function () {
+      debouncedRelocate(gridContainer, maxCols, gap, true)
+    })
+  })
+
   await debouncedRelocate(gridContainer, maxCols, gap)
 }
 
@@ -78,14 +87,14 @@ async function relocate (gridContainer, maxCols = 3, gap = 16, resize = false) {
     if (prevTop) {
       const topBox = prevTop.getBoundingClientRect()
       const topPosition =
-          +prevTop.style.top.replace('px', '') + topBox.height + gap + 'px'
+        +prevTop.style.top.replace('px', '') + topBox.height + gap + 'px'
       style.top = topPosition
     }
 
     if (prevLeft) {
       const leftBox = prevLeft.getBoundingClientRect()
       const leftPosition =
-          +prevLeft.style.left.replace('px', '') + leftBox.width + gap + 'px'
+        +prevLeft.style.left.replace('px', '') + leftBox.width + gap + 'px'
       style.left = leftPosition
     }
 
@@ -104,7 +113,9 @@ async function relocate (gridContainer, maxCols = 3, gap = 16, resize = false) {
     rows += 1
 
     const rowItems = children.slice(i, rows * maxCols)
-    const maxHeight = Math.max(...rowItems.map(x => x.getBoundingClientRect().height))
+    const maxHeight = Math.max(
+      ...rowItems.map((x) => x.getBoundingClientRect().height)
+    )
     totalHeight += maxHeight
   }
 
@@ -122,6 +133,17 @@ async function relocate (gridContainer, maxCols = 3, gap = 16, resize = false) {
   gridContainer.classList.remove('md:grid-cols-3')
   gridContainer.classList.remove('lg:grid-cols-4')
   gridContainer.classList.remove('gap-2')
+}
+
+function throttle (func, delay) {
+  let lastExec = 0
+  return function (...args) {
+    const now = new Date()
+    if (now - lastExec >= delay) {
+      func(...args)
+      lastExec = now
+    }
+  }
 }
 
 function debounce (fn, delay) {
@@ -148,7 +170,7 @@ async function loadImage (img) {
 async function resetGrid (grid) {
   grid.style.position = 'static'
   grid.style.display = 'grid'
-  Array.from(grid.children).forEach(child => {
+  Array.from(grid.children).forEach((child) => {
     Object.assign(child.style, {
       position: 'static',
       height: 'auto',

@@ -50,14 +50,14 @@ export default function HomePage () {
   return (
     <Layout>
       <div class='flex flex-col w-full'>
-        <div class='p-5 h-[400px] overflow-hidden'>
+        <div class='p-5 overflow-hidden'>
           <nav class='text-zinc-400'>
             <h1 class='text-zinc-600 text-xl mb-5'>MW</h1>
             <form>
-              <div class='mb-3'>
+              <div class='mb-10'>
                 <input
                   type='text'
-                  class='px-2 py-1 m-0 focus:outline-none ring-0 text-xs border bg-transparent rounded-[6px] border-zinc-700'
+                  class='px-4 py-2 m-0 focus:outline-none ring-0 text-xs border bg-transparent rounded-[6px] border-zinc-700'
                   placeholder='search'
                   value={query}
                   onKeyUp={(e) => {
@@ -70,20 +70,21 @@ export default function HomePage () {
                 />
               </div>
               <ul class='text-sm flex flex-col gap-[8px]'>
-                <Link href='/about' class='text-zinc-400 hover:text-zinc-100'>
+                <Link href='/about' class='max-w-[200px] text-zinc-400 hover:text-zinc-100'>
                   <li>About</li>
                 </Link>
                 <a
                   href='https://github.com/barelyhuman/minweb-public-data#add-another-site'
-                  class='text-zinc-400 hover:text-zinc-100'
+                  class='max-w-[200px] text-zinc-400 hover:text-zinc-100'
                 >
                   <li>Submit a site?</li>
                 </a>
-                <li class='pt-2 border-t border-zinc-500'>Total: {total}</li>
+                <hr class='h-[1px] w-full my-5 bg-zinc-500 border-0' />
+                <li class='pt-2'>Total: {total}</li>
                 <li>
                   <div class='flex flex-col gap-2'>
                     <p>Categories</p>
-                    <div class='ml-3'>
+                    <div class='flex gap-10 ml-3'>
                       {categories.value.map((x) => (
                         <label class='my-3 flex gap-2 items-center' key={x}>
                           <input
