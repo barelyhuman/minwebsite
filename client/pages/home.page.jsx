@@ -17,7 +17,7 @@ async function fetchLinks () {
   try {
     const response = await fetch('/api/links?' + sp.toString()).json()
     categories.value = response.categories
-    data.value = response.data.map(d => {
+    data.value = response.data.map((d) => {
       if (d.imageURL.startsWith('https://og.barelyhuman.xyz')) {
         const url = new URL(d.imageURL)
         url.searchParams.set('backgroundColor', '181819')
@@ -50,9 +50,9 @@ export default function HomePage () {
   return (
     <Layout>
       <div class='flex flex-col w-full'>
-        <div class='p-5 overflow-hidden'>
+        <div class='overflow-hidden p-5'>
           <nav class='text-zinc-400'>
-            <h1 class='text-zinc-600 text-xl mb-5'>MW</h1>
+            <h1 class='mb-5 text-xl text-zinc-600'>MW</h1>
             <form>
               <div class='mb-10'>
                 <input
@@ -70,7 +70,10 @@ export default function HomePage () {
                 />
               </div>
               <ul class='text-sm flex flex-col gap-[8px]'>
-                <Link href='/about' class='max-w-[200px] text-zinc-400 hover:text-zinc-100'>
+                <Link
+                  href='/about'
+                  class='max-w-[200px] text-zinc-400 hover:text-zinc-100'
+                >
                   <li>About</li>
                 </Link>
                 <a
@@ -84,12 +87,12 @@ export default function HomePage () {
                 <li>
                   <div class='flex flex-col gap-2'>
                     <p>Categories</p>
-                    <div class='flex gap-10 ml-3'>
+                    <div class='flex flex-wrap gap-y-2 gap-x-10 ml-3'>
                       {categories.value.map((x) => (
-                        <label class='my-3 flex gap-2 items-center' key={x}>
+                        <label class='flex gap-2 items-center my-3' key={x}>
                           <input
                             type='checkbox'
-                            class='rounded-sm h-3 w-3 bg-base checked:bg-lime-400 hover:checked:bg-lime-400 focus:bg-lime-400'
+                            class='w-3 h-3 rounded-sm bg-base checked:bg-lime-400 hover:checked:bg-lime-400 focus:bg-lime-400'
                             onChange={async (e) => {
                               const fd = new FormData(e.target.closest('form'))
                               const categories = fd.getAll('category')
@@ -116,9 +119,7 @@ export default function HomePage () {
             </form>
           </nav>
         </div>
-        <div
-          class='bento min-h-[90vh] grid w-full sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2'
-        >
+        <div class='bento min-h-[90vh] grid w-full sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2'>
           {data.value
             .sort((x, y) => x.title.toLowerCase() > y.title.toLowerCase())
             .map((tile) => {
@@ -126,18 +127,19 @@ export default function HomePage () {
                 <a
                   key={tile.link}
                   href={tile.link}
-                  class='group transition-all opacity-0 duration-200 min-h-[150px] rounded-lg overflow-hidden scale-100 hover:scale-[115%] hover:z-10'
+                  class='group transition-all invisible duration-200 min-h-[150px] rounded-lg overflow-hidden hover:z-10'
                 >
-                  <div class='hover:cursor-pointer relative w-full h-full'>
+                  <div class='relative w-full h-full hover:cursor-pointer'>
                     <img
-                      class='border-0 w-full h-full'
+                      class='w-full h-full border-0'
                       style={`background:${tile.backgroundColor}`}
                       data-src={tile.imageURL}
-                      ref={node => {
+                      ref={(node) => {
                         if (!node) return
                         const img = new window.Image()
                         img.addEventListener('load', function () {
                           node.src = this.src
+                          node.style.backgroundColor = 'initial'
                         })
                         img.src = node.dataset.src
                       }}

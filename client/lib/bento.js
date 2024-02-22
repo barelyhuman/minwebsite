@@ -1,18 +1,36 @@
 export const debouncedBento = debounce(createBento, 350)
 export const debouncedRelocate = debounce(relocate, 350)
 
+const MIN_WIDTH_THRESHOLD = 40
+
+let lastContainerWidth
 export async function createBento (gridContainer, maxCols = 3, gap = 16) {
-  window.addEventListener('resize', function () {
-    debouncedRelocate(gridContainer, maxCols, gap, true)
-  })
-
-  Array.from(gridContainer.querySelectorAll('img')).forEach((img) => {
-    if (img.naturalHeight > 0) return
-
-    img.addEventListener('load', function () {
-      debouncedRelocate(gridContainer, maxCols, gap, true)
+  if (!lastContainerWidth) {
+    const box = gridContainer.getBoundingClientRect()
+    lastContainerWidth = box.width
+  }
+  if (window.ResizeObserver) {
+    const resizeObserver = new window.ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (
+          Math.abs(lastContainerWidth - entry.contentRect.width) >
+          MIN_WIDTH_THRESHOLD
+        ) {
+          lastContainerWidth = entry.contentRect.width
+          debouncedRelocate(gridContainer, maxCols, gap, true)
+        }
+      }
     })
-  })
+    resizeObserver.observe(gridContainer)
+  } else {
+    window.addEventListener('resize', function () {
+      const newBox = gridContainer.getBoundingClientRect()
+      if (Math.abs(lastContainerWidth - newBox.width) > MIN_WIDTH_THRESHOLD) {
+        lastContainerWidth = newBox.width
+        debouncedRelocate(gridContainer, maxCols, gap, true)
+      }
+    })
+  }
 
   await debouncedRelocate(gridContainer, maxCols, gap)
 }
@@ -32,7 +50,16 @@ async function relocate (gridContainer, maxCols = 3, gap = 16, resize = false) {
     maxCols = cols
   }
 
+  if (maxCols <= 0) {
+    maxCols = 1
+  }
+
   const expectedWidth = usableGridWidth / maxCols
+
+  Object.assign(gridContainer.style, {
+    position: 'relative',
+    display: 'block'
+  })
 
   for (
     let childIndex = 0;
@@ -40,14 +67,14 @@ async function relocate (gridContainer, maxCols = 3, gap = 16, resize = false) {
     childIndex += 1
   ) {
     const child = gridContainer.children[childIndex]
-    child.style.opacity = 0
+    child.classList.remove('scale-100')
+    child.classList.remove('hover:scale-[115%]')
+    child.style.visibility = 'hidden'
     const img = child.querySelector('img')
     if (img && img.src) {
       const alreadyLoaded = loadImage(img)
       if (alreadyLoaded instanceof Promise) {
         await alreadyLoaded
-      } else {
-        child.style.opacity = 1
       }
     }
     const boxPosition = childIndex + 1
@@ -98,12 +125,20 @@ async function relocate (gridContainer, maxCols = 3, gap = 16, resize = false) {
       style.left = leftPosition
     }
 
+    child.classList.add('scale-100')
+    child.classList.add('hover:scale-[115%]')
     Object.assign(child.style, {
       ...style,
       position: 'absolute',
-      visibility: 'visible',
-      opacity: 1
+      visibility: 'visible'
     })
+
+    if (img) {
+      Object.assign(img.style, {
+        ...style,
+        visibility: 'visible'
+      })
+    }
   }
 
   let totalHeight = 0
