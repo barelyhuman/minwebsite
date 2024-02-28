@@ -35,6 +35,24 @@ export async function createBento (gridContainer, maxCols = 3, gap = 16) {
   await debouncedRelocate(gridContainer, maxCols, gap)
 }
 
+export async function calculateChildSizeStyle (child, width) {
+  const hasImg = child.querySelector('img')
+  const updatedStyle = {}
+  const defaultRatio = 0.525
+  if (hasImg) {
+    await loadImage(hasImg)
+    const imageRatio = hasImg.naturalHeight / hasImg.naturalWidth
+    updatedStyle.height = width * imageRatio + 'px'
+    updatedStyle.minHeight = width * imageRatio + 'px'
+    updatedStyle.width = width + 'px'
+  } else {
+    updatedStyle.height = width * defaultRatio + 'px'
+    updatedStyle.minHeight = width * defaultRatio + 'px'
+    updatedStyle.width = width + 'px'
+  }
+  return updatedStyle
+}
+
 async function relocate (gridContainer, maxCols = 3, gap = 16, resize = false) {
   if (resize) {
     await resetGrid(gridContainer)
@@ -100,16 +118,10 @@ async function relocate (gridContainer, maxCols = 3, gap = 16, resize = false) {
       left: 0 + gap / 2 + 'px'
     }
 
-    if (img && img.src) {
-      const ratio = img.naturalHeight / img.naturalWidth
-      style.height = expectedWidth * ratio + 'px'
-      style.minHeight = expectedWidth * ratio + 'px'
-      style.width = expectedWidth + 'px'
-    } else {
-      style.height = expectedWidth * 0.525 + 'px'
-      style.minHeight = expectedWidth * 0.525 + 'px'
-      style.width = expectedWidth + 'px'
-    }
+    Object.assign(
+      style,
+      await calculateChildSizeStyle(child, expectedWidth)
+    )
 
     if (prevTop) {
       const topBox = prevTop.getBoundingClientRect()
@@ -197,7 +209,13 @@ async function loadImage (img) {
   if (img.naturalHeight > 0) return true
   return new Promise((resolve) => {
     img.addEventListener('load', function () {
-      resolve(true)
+      if (this.naturalHeight > 0) {
+        resolve(true)
+      } else {
+        setTimeout(() => {
+          resolve(true)
+        }, 1000)
+      }
     })
   })
 }
