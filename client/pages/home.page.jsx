@@ -2,7 +2,7 @@ import { effect, signal } from '@preact/signals'
 import fetch from '@webreflection/fetch'
 import { Link, useLocation, useSearch } from 'wouter-preact'
 import { Layout } from '../components/layout'
-import { debouncedBento as createBento } from '../lib/bento'
+import { createBento } from '../lib/bento'
 
 const data = signal([])
 const total = signal(0)
@@ -17,15 +17,19 @@ async function fetchLinks () {
   try {
     const response = await fetch('/api/links?' + sp.toString()).json()
     categories.value = response.categories
-    data.value = response.data.map((d) => {
-      if (d.imageURL.startsWith('https://og.barelyhuman.xyz')) {
-        const url = new URL(d.imageURL)
-        url.searchParams.set('backgroundColor', '181819')
-        d.imageURL = url.toString()
-        d.backgroundColor = 'rgb(25,25,25)'
-      }
-      return d
-    })
+    data.value = response.data
+      .map((d) => {
+        if (d.imageURL.startsWith('https://og.barelyhuman.xyz')) {
+          const url = new URL(d.imageURL)
+          url.searchParams.set('backgroundColor', '181819')
+          d.imageURL = url.toString()
+          d.backgroundColor = 'rgb(25,25,25)'
+        }
+        return d
+      })
+      .sort((x, y) =>
+        String(x.title.toLowerCase()).localeCompare(y.title.toLowerCase())
+      )
     total.value = response.total
   } catch (err) {
     console.error(err)
@@ -120,37 +124,35 @@ export default function HomePage () {
           </nav>
         </div>
         <div class='bento min-h-[90vh] grid w-full sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2'>
-          {data.value
-            .sort((x, y) => x.title.toLowerCase() > y.title.toLowerCase())
-            .map((tile) => {
-              return (
-                <a
-                  key={tile.link}
-                  href={tile.link}
-                  class='group transition-all invisible duration-200 min-h-[150px] rounded-lg overflow-hidden hover:z-10'
-                >
-                  <div class='relative w-full h-full hover:cursor-pointer'>
-                    <img
-                      class='w-full h-full border-0'
-                      style={`background:${tile.backgroundColor}`}
-                      data-src={tile.imageURL}
-                      ref={(node) => {
-                        if (!node) return
-                        const img = new window.Image()
-                        img.addEventListener('load', function () {
-                          node.src = this.src
-                          node.style.backgroundColor = 'initial'
-                        })
-                        img.src = node.dataset.src
-                      }}
-                    />
-                    <div class='group-hover:hidden absolute bottom-2 left-2 px-3 py-1 text-xs rounded-sm bg-black supports-[backdrop-filter]:bg-black/75 supports-[backdrop-filter]:backdrop-blur-md text-white'>
-                      <p>{tile.title}</p>
-                    </div>
+          {data.value.map((tile) => {
+            return (
+              <a
+                key={tile.link}
+                href={tile.link}
+                class='group transition-all duration-200 min-h-[150px] rounded-lg overflow-hidden hover:z-10 scale-100 hover:scale-[115%]'
+              >
+                <div class='relative w-full h-full hover:cursor-pointer'>
+                  <img
+                    class='w-full h-full border-0'
+                    style={`background:${tile.backgroundColor}`}
+                    data-src={tile.imageURL}
+                    ref={(node) => {
+                      if (!node) return
+                      const img = new window.Image()
+                      img.addEventListener('load', function () {
+                        node.src = this.src
+                        node.style.backgroundColor = 'initial'
+                      })
+                      img.src = node.dataset.src
+                    }}
+                  />
+                  <div class='group-hover:hidden absolute bottom-2 left-2 px-3 py-1 text-xs rounded-sm bg-black supports-[backdrop-filter]:bg-black/75 supports-[backdrop-filter]:backdrop-blur-md text-white'>
+                    <p>{tile.title}</p>
                   </div>
-                </a>
-              )
-            })}
+                </div>
+              </a>
+            )
+          })}
         </div>
       </div>
     </Layout>

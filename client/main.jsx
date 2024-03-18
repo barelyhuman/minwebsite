@@ -38,7 +38,6 @@ export async function prerender (data) {
 
   try {
     const result = await render()
-    console.log('\n' + result)
     return result
   } catch {}
 }
