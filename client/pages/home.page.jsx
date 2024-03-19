@@ -87,7 +87,11 @@ export default function HomePage () {
                   <li>Submit a site?</li>
                 </a>
                 <hr class='h-[1px] w-full my-5 bg-zinc-500 border-0' />
-                <li class='pt-2'>Total: {total}</li>
+                <li class='pt-2'>
+                  Showing:{' '}
+                  <span class='text-zinc-400'>{data.value.length}</span>
+                  <span class='text-zinc-600'>/{total}</span>
+                </li>
                 <li>
                   <div class='flex flex-col gap-2'>
                     <p>Categories</p>
@@ -138,12 +142,7 @@ export default function HomePage () {
                     data-src={tile.imageURL}
                     ref={(node) => {
                       if (!node) return
-                      const img = new window.Image()
-                      img.addEventListener('load', function () {
-                        node.src = this.src
-                        node.style.backgroundColor = 'initial'
-                      })
-                      img.src = node.dataset.src
+                      lazyLoadImage(node)
                     }}
                   />
                   <div class='group-hover:hidden absolute bottom-2 left-2 px-3 py-1 text-xs rounded-sm bg-black supports-[backdrop-filter]:bg-black/75 supports-[backdrop-filter]:backdrop-blur-md text-white'>
@@ -157,4 +156,30 @@ export default function HomePage () {
       </div>
     </Layout>
   )
+}
+
+const microQueue = Promise.prototype.then.bind(Promise.resolve())
+
+function lazyLoadImage (node) {
+  const container = document.querySelector('.bento')
+  node.addEventListener('load', function () {
+    createBento(container, 4, 8)
+  })
+  microQueue(async () => {
+    const img = new window.Image()
+    if (img.naturalHeight > 0) {
+      createBento(container, 4, 8)
+      return
+    }
+    const promise = new Promise((resolve) => {
+      img.addEventListener('load', function () {
+        node.src = this.src
+        node.style.backgroundColor = 'initial'
+      })
+      img.src = node.dataset.src
+      resolve()
+    })
+    await promise
+    createBento(container, 4, 8)
+  })
 }

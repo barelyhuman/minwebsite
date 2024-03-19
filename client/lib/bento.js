@@ -1,6 +1,7 @@
 const debouncedCreateBento = debounce(resizeableBento, 350)
 
 const MIN_WIDTH_THRESHOLD = 40
+const defaultRatio = 680 / 1200
 let lastContainerWidth
 
 async function resizeableBento (gridContainer, maxCols = 3, gap = 16) {
@@ -53,11 +54,12 @@ async function getBentoPositions (
   const elmsPointPromises = Array.from(container.childNodes).map(async (d) => {
     const img = d.querySelector('img')
     const imgDims = {}
-    await loadImage(img)
     imgDims.height = img.naturalHeight
     imgDims.width = img.naturalWidth
+    const isImageLoaded = () => img.naturalHeight > 0
     return {
       target: d,
+      isImageLoaded,
       image: d.querySelector('img'),
       imageDims: imgDims,
       ratio: imgDims.height / imgDims.width
@@ -86,14 +88,20 @@ async function getBentoPositions (
       item.styles = {
         height: expectedWidth * item.ratio,
         width: expectedWidth,
-        top: 0,
-        left: 0
+        top: 0 + gap,
+        left: 0 + gap,
+        objectFit: 'cover'
       }
       if (topItem) {
         item.styles.top = topItem.styles.top + topItem.styles.height + gap
       }
       if (leftItem) {
         item.styles.left = leftItem.styles.left + leftItem.styles.width + gap
+      }
+      if (!item.isImageLoaded()) {
+        item.styles.height = expectedWidth * defaultRatio
+        item.styles.width = expectedWidth
+        item.styles.objectFit = 'cover'
       }
     }
   }
@@ -130,10 +138,14 @@ async function createBento (container, maxCols = 4, gap = 16) {
   positions.forEach((p) => {
     Object.assign(p.target.style, {
       position: 'absolute',
-      top: (p.styles.top || 0) + 'px',
-      left: (p.styles.left || 0) + 'px',
+      top: p.styles.top + 'px',
+      left: p.styles.left + 'px',
       height: p.styles.height + 'px',
       width: p.styles.width + 'px'
+    })
+
+    Object.assign(p.image.style, {
+      objectFit: p.styles.objectFit
     })
   })
 
