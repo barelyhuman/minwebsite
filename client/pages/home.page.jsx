@@ -162,6 +162,7 @@ const microQueue = Promise.prototype.then.bind(Promise.resolve())
 
 function lazyLoadImage (node) {
   const container = document.querySelector('.bento')
+  if (node.__minWebLoaded) return
   node.addEventListener('load', function () {
     createBento(container, 4, 8)
   })
@@ -180,6 +181,7 @@ function lazyLoadImage (node) {
       resolve()
     })
     await promise
+    node.__minWebLoaded = true
     createBento(container, 4, 8)
   })
 }
