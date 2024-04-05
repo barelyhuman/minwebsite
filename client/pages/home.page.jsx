@@ -135,9 +135,9 @@ export default function HomePage () {
                 href={tile.link}
                 class='group transition-all duration-200 min-h-[150px] rounded-lg overflow-hidden hover:z-10 scale-100 hover:scale-[115%]'
               >
-                <div class='relative w-full h-full hover:cursor-pointer'>
+                <div class='relative w-full h-full'>
                   <img
-                    class='w-full h-full border-0'
+                    class='w-full h-full rounded-lg border border-zinc-800'
                     style={`background:${tile.backgroundColor}`}
                     data-src={tile.imageURL}
                     ref={(node) => {
