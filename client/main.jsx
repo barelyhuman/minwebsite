@@ -5,11 +5,13 @@ import { Route, Router, Switch } from 'wouter-preact'
 import HomePage from './pages/home.page.jsx'
 import AboutPage from './pages/about.page.jsx'
 import renderToString from 'preact-render-to-string'
+import { LoginPage } from './pages/login.page.jsx'
 
 const App = (props) => (
   <>
     <Router ssrPath={props.url}>
       <Switch>
+        <Route path='/login' component={LoginPage} />
         <Route path='/about' component={AboutPage} />
         <Route path='/' component={HomePage} />
         <Route default>404: No such page!</Route>
