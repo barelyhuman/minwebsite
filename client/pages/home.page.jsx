@@ -95,7 +95,7 @@ export default function HomePage () {
                 <li>
                   <div class='flex flex-col gap-2'>
                     <p>Categories</p>
-                    <div class='flex flex-wrap gap-y-2 gap-x-10 ml-3'>
+                    <div class='flex flex-wrap gap-y-2 gap-x-10'>
                       {categories.value.map((x) => (
                         <label class='flex gap-2 items-center my-3' key={x}>
                           <input
