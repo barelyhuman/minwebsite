@@ -1,0 +1,53 @@
+{{define "home"}} {{template "header"}}
+
+<div class="my-10" x-data="{ shownCategories: [], dispatched: false }">
+  <div class="mb-10">
+    {{ range .Categories }}
+    <form>
+      <label>
+        <input
+          type="checkbox"
+          value="{{.}}"
+          x-model="shownCategories"
+          class="w-4 h-4 text-black rounded-sm shadow checked:shadow-xl"
+        />
+        <span class="ml-1">{{.}}</span>
+      </label>
+    </form>
+    {{end}}
+  </div>
+  <div class="grid grid-cols-3 gap-4 items-start" x-masonry.poll.2500>
+    {{ range .Links }}
+    <template
+      x-if="shownCategories.length ? shownCategories.includes('{{.Category}}'): true"
+    >
+      <div
+        class="overflow-hidden text-white rounded-md border-2 group border-zinc-900"
+        x-data="{height: 250, color: '{{.BackgroundColor}}'}"
+        :style="{height:height+'px', backgroundColor: color}"
+        x-transition
+      >
+        <a
+          class="block w-full h-full transition duration-200 delay-75 group-hover:scale-75"
+          href="/review/{{.Slug}}"
+        >
+          <img class="w-full h-full" data-image="{{.ImageURL}}"
+          data-category="{{.Category}}" x-intersect="$el.src = $el.dataset.image" @load="
+          const ratio = $el.naturalHeight / $el.naturalWidth; 
+          height = $el.getBoundingClientRect().width * ratio;
+          if(dispatched){
+            console.log('already dispatched')
+            return 
+          }
+          dispatched = true
+          $dispatch('reload:masonry')
+          dispatched = false
+          ">
+        </a>
+      </div>
+    </template>
+    {{end}}
+  </div>
+</div>
+
+{{template "footer"}} {{end}}

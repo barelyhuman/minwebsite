@@ -1,0 +1,24 @@
+{{define "login"}} {{template "header"}}
+
+<div>
+  <form method="POST">
+    <input type="hidden" name="_csrf" value="{{.CSRFToken}}" />
+    <div>
+      <input type="text" name="username" placehoder="Username" />
+    </div>
+    <div>
+      <input
+        type="password"
+        name="password"
+        placehoder="Super Secret Password"
+      />
+    </div>
+    <div>
+      <button type="submit">Login</button>
+      {{if .Error}}
+      <p class="text-red-400">{{.Error}}</p>
+      {{end}}
+    </div>
+  </form>
+</div>
+{{template "footer"}} {{end}}
