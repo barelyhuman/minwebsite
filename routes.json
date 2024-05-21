@@ -1,8 +1,8 @@
 [
   {
-    "method": "POST",
+    "method": "GET",
     "path": "/login",
-    "name": "main.loginRequest"
+    "name": "main.loginPage"
   },
   {
     "method": "GET",
@@ -10,19 +10,9 @@
     "name": "main.reviewPage"
   },
   {
-    "method": "echo_route_not_found",
-    "path": "/*",
-    "name": "main.main.func1"
-  },
-  {
     "method": "GET",
-    "path": "/login",
-    "name": "main.loginPage"
-  },
-  {
-    "method": "echo_route_not_found",
-    "path": "/admin",
-    "name": "github.com/labstack/echo/v4.glob..func1"
+    "path": "/about",
+    "name": "main.aboutPage"
   },
   {
     "method": "echo_route_not_found",
@@ -35,13 +25,23 @@
     "name": "main.adminPage"
   },
   {
-    "method": "GET",
-    "path": "/about",
-    "name": "main.aboutPage"
+    "method": "echo_route_not_found",
+    "path": "/*",
+    "name": "main.main.func1"
+  },
+  {
+    "method": "POST",
+    "path": "/login",
+    "name": "main.loginRequest"
   },
   {
     "method": "GET",
     "path": "/",
     "name": "main.homePage"
+  },
+  {
+    "method": "echo_route_not_found",
+    "path": "/admin",
+    "name": "github.com/labstack/echo/v4.glob..func1"
   }
 ]

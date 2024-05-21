@@ -18,7 +18,7 @@ devClient:
 	npm run dev
 
 devServer:
-	find **/*.{go,html}  | entr -sr "go run ."
+	find **/*.{go,html,css}  | entr -sr "go run ."
 
 dev:
 	$(MAKE) -j 2 devClient devServer
