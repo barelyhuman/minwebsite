@@ -28,6 +28,9 @@ import (
 	"github.com/yuin/goldmark"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/gorilla/sessions"
+	"github.com/joho/godotenv"
+	glog "github.com/labstack/gommon/log"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -41,13 +44,18 @@ var reviewTemplateString string
 //go:embed views/*
 var views embed.FS
 
+const ErrorType = "error"
+
 var DB *gorm.DB
+var FlashMessages *FlashMessage
 
 func main() {
-
-	fmt.Println("Migrated database")
+	godotenv.Load()
 
 	DB = InitDatabase()
+	fmt.Println("Migrated database")
+
+	FlashMessages = NewFlashMessageContainer()
 
 	linkData := loadMinWebJSON()
 
@@ -80,6 +88,21 @@ func main() {
 	}
 
 	e := echo.New()
+
+	e.RouteNotFound("*", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "notFoundPage", struct {
+			ErrorFlashes []string
+		}{
+			ErrorFlashes: FlashMessages.GetAll(c, "error"),
+		})
+	})
+
+	e.Logger.SetLevel(glog.INFO)
+
+	if env.Get("APP_ENV", "development") == "development" {
+		e.Use(middleware.Logger())
+		e.Use(middleware.Recover())
+	}
 
 	e.Renderer = &EchoRenderer{
 		templates: template.Must(
@@ -115,6 +138,45 @@ func main() {
 	e.GET("/about", aboutPage)
 	e.GET("/", homePage)
 
+	adminGroupMux := e.Group("/admin")
+
+	adminGroupMux.Use(
+		middleware.KeyAuthWithConfig(
+			middleware.KeyAuthConfig{
+				KeyLookup: "header:Authorization,cookie:auth",
+				ErrorHandler: func(err error, c echo.Context) error {
+					FlashMessages.Add(c, ErrorType, "You aren't allowed access this route")
+					c.Redirect(http.StatusSeeOther, "/404")
+					return err
+				},
+				Validator: func(key string, c echo.Context) (bool, error) {
+					dbToken := &models.Token{}
+					DB.Where(&models.Token{Token: key}).First(dbToken)
+
+					if dbToken.Token == "" {
+						c.Redirect(http.StatusSeeOther, "/")
+						return false, nil
+					}
+
+					if dbToken.ExpiresAt.Before(time.Now()) {
+						c.Redirect(http.StatusSeeOther, "/")
+						return false, nil
+					}
+
+					currentUser := &models.User{}
+					DB.Where("id=?", dbToken.UserID).Select("id", "username").First(currentUser)
+					fmt.Printf("currentUser: %v\n", currentUser)
+					c.Set("currentUser", currentUser)
+
+					return true, nil
+				},
+			},
+		),
+	)
+
+	adminGroupMux.GET("", adminPage)
+
+	writeRouteManifest(e)
 	gracefulShutdown(e)
 }
 
@@ -158,7 +220,7 @@ func gracefulShutdown(e *echo.Echo) {
 		}
 	} else {
 		if err := e.Start(":1323"); err != nil && err != http.ErrServerClosed {
-			e.Logger.Fatal("shutting down the server")
+			e.Logger.Fatal("shutting down the server with err", err)
 		}
 	}
 }
@@ -180,11 +242,13 @@ type LinkItem struct {
 
 func loginPage(c echo.Context) error {
 	return c.Render(http.StatusOK, "login", struct {
-		CSRFToken interface{}
-		Error     string
+		ErrorFlashes []string
+		CSRFToken    interface{}
+		Error        string
 	}{
-		CSRFToken: c.Get("csrf"),
-		Error:     c.QueryParam("error"),
+		ErrorFlashes: FlashMessages.GetAll(c, ErrorType),
+		CSRFToken:    c.Get("csrf"),
+		Error:        c.QueryParam("error"),
 	})
 }
 
@@ -222,7 +286,7 @@ func loginRequest(c echo.Context) error {
 		SameSite: http.SameSiteLaxMode,
 		Secure:   false,
 	})
-	c.Redirect(http.StatusSeeOther, "/")
+	c.Redirect(http.StatusSeeOther, "/admin")
 	return nil
 }
 
@@ -251,13 +315,15 @@ func reviewPage(c echo.Context) error {
 
 	c.Render(http.StatusOK, "review",
 		struct {
-			Title   string
-			Link    string
-			Content template.HTML
+			Title        string
+			Link         string
+			Content      template.HTML
+			ErrorFlashes []string
 		}{
-			Title:   meta.Title,
-			Link:    meta.Link,
-			Content: template.HTML(buff.Bytes()),
+			Title:        meta.Title,
+			Link:         meta.Link,
+			Content:      template.HTML(buff.Bytes()),
+			ErrorFlashes: FlashMessages.GetAll(c, ErrorType),
 		})
 
 	return nil
@@ -272,16 +338,30 @@ func homePage(c echo.Context) error {
 	}
 
 	return c.Render(200, "home", struct {
-		Links      []LinkItem
-		Categories []string
+		ErrorFlashes []string
+		Links        []LinkItem
+		Categories   []string
 	}{
-		Links:      linkData,
-		Categories: *categories,
+		ErrorFlashes: FlashMessages.GetAll(c, ErrorType),
+		Links:        linkData,
+		Categories:   *categories,
 	})
 }
 
 func aboutPage(c echo.Context) error {
-	return c.Render(http.StatusOK, "about", "Sid")
+	return c.Render(http.StatusOK, "about", struct {
+		ErrorFlashes []string
+	}{
+		ErrorFlashes: FlashMessages.GetAll(c, ErrorType),
+	})
+}
+
+func adminPage(c echo.Context) error {
+	return c.Render(http.StatusOK, "admin", struct {
+		ErrorFlashes []string
+	}{
+		ErrorFlashes: FlashMessages.GetAll(c, ErrorType),
+	})
 }
 
 type EchoRenderer struct {
@@ -399,4 +479,50 @@ func fastHash(str string) string {
 	}
 
 	return fmt.Sprintf("%v", hash)
+}
+
+type FlashMessage struct {
+	flashStore *sessions.CookieStore
+}
+
+func NewFlashMessageContainer() *FlashMessage {
+	return &FlashMessage{
+		flashStore: sessions.NewCookieStore(
+			[]byte(env.Get("SECURE_COOKIE_SECRET", "super-secret")),
+		),
+	}
+}
+
+func (fm *FlashMessage) Add(c echo.Context, msgType, message string) {
+	store, _ := fm.flashStore.Get(c.Request(), msgType)
+	store.AddFlash(message)
+	err := store.Save(c.Request(), c.Response())
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+	}
+}
+
+func (fm *FlashMessage) GetAll(c echo.Context, msgType string) (result []string) {
+	store, err := fm.flashStore.Get(c.Request(), msgType)
+
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+	}
+
+	messages := store.Flashes()
+	if len(messages) == 0 {
+		return
+	}
+
+	store.Save(c.Request(), c.Response())
+	for _, fl := range messages {
+		result = append(result, fl.(string))
+	}
+
+	return
+}
+
+func writeRouteManifest(e *echo.Echo) {
+	data, _ := json.MarshalIndent(e.Routes(), "", "  ")
+	os.WriteFile("routes.json", data, 0644)
 }

@@ -1,20 +1,19 @@
-{{define "login"}} {{template "header"}}
+{{define "login"}} {{template "header" .}}
 
-<div>
-  <form method="POST">
+<div class="mx-auto mt-20 max-w-2xl">
+  <form method="POST" class="flex flex-col gap-2">
     <input type="hidden" name="_csrf" value="{{.CSRFToken}}" />
     <div>
-      <input type="text" name="username" placehoder="Username" />
+      <input autofocus class="w-full rounded-md border border-zinc-100 focus:border-black" type="text" name="username" placeholder="Username" />
     </div>
     <div>
-      <input
-        type="password"
+      <input class="w-full rounded-md border border-zinc-100 focus:border-black"         type="password"
         name="password"
-        placehoder="Super Secret Password"
+        placeholder="Super Secret Password"
       />
     </div>
-    <div>
-      <button type="submit">Login</button>
+    <div class="mt-4">
+      <button type="submit" class="px-3 py-2 w-full text-white bg-black rounded-md hover:shadow-xl">Login</button>
       {{if .Error}}
       <p class="text-red-400">{{.Error}}</p>
       {{end}}
