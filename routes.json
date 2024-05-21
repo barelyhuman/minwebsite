@@ -1,18 +1,23 @@
 [
   {
+    "method": "POST",
+    "path": "/login",
+    "name": "main.loginRequest"
+  },
+  {
+    "method": "GET",
+    "path": "/review/:hash",
+    "name": "main.reviewPage"
+  },
+  {
     "method": "echo_route_not_found",
     "path": "/*",
     "name": "main.main.func1"
   },
   {
     "method": "GET",
-    "path": "/about",
-    "name": "main.aboutPage"
-  },
-  {
-    "method": "GET",
-    "path": "/",
-    "name": "main.homePage"
+    "path": "/login",
+    "name": "main.loginPage"
   },
   {
     "method": "echo_route_not_found",
@@ -31,17 +36,12 @@
   },
   {
     "method": "GET",
-    "path": "/login",
-    "name": "main.loginPage"
-  },
-  {
-    "method": "POST",
-    "path": "/login",
-    "name": "main.loginRequest"
+    "path": "/about",
+    "name": "main.aboutPage"
   },
   {
     "method": "GET",
-    "path": "/review/:hash",
-    "name": "main.reviewPage"
+    "path": "/",
+    "name": "main.homePage"
   }
 ]

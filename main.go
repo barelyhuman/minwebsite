@@ -333,8 +333,20 @@ func homePage(c echo.Context) error {
 	linkData := loadMinWebJSON()
 	categories := NewCategorySet()
 
+	searchTerm := c.QueryParam("q")
+
+	filteredData := []LinkItem{}
 	for _, l := range linkData {
 		categories.Add(l.Category)
+		if len(searchTerm) == 0 {
+			filteredData = append(filteredData, l)
+		} else {
+			nameContains := strings.Contains(strings.ToLower(l.Title), strings.ToLower(searchTerm))
+			linkContains := strings.Contains(strings.ToLower(l.Link), strings.ToLower(searchTerm))
+			if nameContains || linkContains {
+				filteredData = append(filteredData, l)
+			}
+		}
 	}
 
 	return c.Render(200, "home", struct {
@@ -343,7 +355,7 @@ func homePage(c echo.Context) error {
 		Categories   []string
 	}{
 		ErrorFlashes: FlashMessages.GetAll(c, ErrorType),
-		Links:        linkData,
+		Links:        filteredData,
 		Categories:   *categories,
 	})
 }
