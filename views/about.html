@@ -1,9 +1,27 @@
 {{define "about"}} {{template "header" .}}
 
 <main class="mx-auto my-10 max-w-3xl">
-    <article class="min-w-full text-center prose prose-zinc">
-        <p>A website dedicated to curating aesthetically minimal websites.</p>
-    </article> 
+  <article class="min-w-full prose prose-zinc">
+    <p>This is a website dedicated to curating aesthetically minimal websites.</p>
+
+    <h3>Built using the following principles</h3>
+    <ul>
+      <li>Keep it Simple</li>
+      <li>Not everything needs to tracked all the time</li>
+      <li>Keep the memory footprint minimal for the user</li>
+    </ul>
+
+    <p>
+        The site is <a href="https://github.com/barelyhuman/minweb.site">open source</a> and under the MIT license.  
+    </p>
+
+    <p>
+        <blockquote>
+            If you feel like you like the curated list and would like to help, do consider sponsoring on <a href="https://ko-fi.com/barelyreaper">Ko-Fi</a> or <a href="https://github.com/sponsors/barelyhuman">Github</a>
+        </blockquote>
+    </p>
+
+  </article>
 </main>
 
 {{template "footer"}} {{end}}
