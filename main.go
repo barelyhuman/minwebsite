@@ -28,6 +28,7 @@ import (
 	"github.com/yuin/goldmark"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/go-co-op/gocron/v2"
 	"github.com/gorilla/sessions"
 	"github.com/joho/godotenv"
 	glog "github.com/labstack/gommon/log"
@@ -51,6 +52,11 @@ var FlashMessages *FlashMessage
 
 func main() {
 	godotenv.Load()
+
+	scheduler, err := gocron.NewScheduler()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	DB = InitDatabase()
 	fmt.Println("Migrated database")
@@ -176,8 +182,13 @@ func main() {
 
 	adminGroupMux.GET("", adminPage)
 
+	addJobs(scheduler)
+	syncLinks()
+	scheduler.Start()
+
 	writeRouteManifest(e)
 	gracefulShutdown(e)
+	scheduler.Shutdown()
 }
 
 func getRatelimiterConfig() middleware.RateLimiterConfig {
@@ -330,12 +341,14 @@ func reviewPage(c echo.Context) error {
 }
 
 func homePage(c echo.Context) error {
-	linkData := loadMinWebJSON()
+	linkData := []models.Site{}
+	DB.Find(&linkData)
+
 	categories := NewCategorySet()
 
 	searchTerm := c.QueryParam("q")
 
-	filteredData := []LinkItem{}
+	filteredData := []models.Site{}
 	for _, l := range linkData {
 		categories.Add(l.Category)
 		if len(searchTerm) == 0 {
@@ -351,7 +364,7 @@ func homePage(c echo.Context) error {
 
 	return c.Render(200, "home", struct {
 		ErrorFlashes []string
-		Links        []LinkItem
+		Links        []models.Site
 		Categories   []string
 	}{
 		ErrorFlashes: FlashMessages.GetAll(c, ErrorType),
@@ -456,7 +469,8 @@ func InitDatabase() *gorm.DB {
 	}
 	if err := db.AutoMigrate(
 		&models.Token{},
-		&models.User{}); err != nil {
+		&models.User{},
+		&models.Site{}); err != nil {
 		panic(err)
 	}
 
@@ -535,6 +549,41 @@ func (fm *FlashMessage) GetAll(c echo.Context, msgType string) (result []string)
 }
 
 func writeRouteManifest(e *echo.Echo) {
-	data, _ := json.MarshalIndent(e.Routes(), "", "  ")
+	sortedRoutes := e.Routes()
+	slices.SortFunc(sortedRoutes, func(a *echo.Route, b *echo.Route) int {
+		return strings.Compare(a.Name, b.Name)
+	})
+
+	data, _ := json.MarshalIndent(sortedRoutes, "", "  ")
 	os.WriteFile("routes.json", data, 0644)
+}
+
+func syncLinks() {
+	links := loadMinWebJSON()
+
+	for _, link := range links {
+		newSite := models.Site{}
+		newSite.Title = link.Title
+		newSite.Link = link.Link
+		newSite.Category = link.Category
+		newSite.ImageURL = link.ImageURL
+		newSite.BackgroundColor = link.BackgroundColor
+		newSite.Slug = link.Slug
+
+		existing := new(models.Site)
+		DB.Where(models.Site{
+			Link: link.Link,
+		}).Attrs(newSite).FirstOrCreate(&existing)
+	}
+}
+
+func addJobs(s gocron.Scheduler) {
+	s.NewJob(
+		gocron.DurationJob(
+			20*time.Second,
+		),
+		gocron.NewTask(
+			syncLinks,
+		),
+	)
 }
