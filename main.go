@@ -1,4 +1,3 @@
-// go:generate go run dao/dao.go
 package main
 
 import (
@@ -14,10 +13,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"slices"
 	"sort"
 	"strings"
-	txtTemplate "text/template"
 	"time"
 
 	"github.com/barelyhuman/go/env"
@@ -25,6 +24,7 @@ import (
 	"github.com/barelyhuman/minweb.site/models"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+
 	"github.com/yuin/goldmark"
 	"golang.org/x/crypto/bcrypt"
 
@@ -39,8 +39,8 @@ import (
 //go:embed static
 var static embed.FS
 
-//go:embed resources/review.tmpl.md
-var reviewTemplateString string
+//go:embed content/*.md
+var contentFS embed.FS
 
 //go:embed views/*
 var views embed.FS
@@ -62,36 +62,6 @@ func main() {
 	fmt.Println("Migrated database")
 
 	FlashMessages = NewFlashMessageContainer()
-
-	linkData := getLinks("")
-
-	reviewTemplate := txtTemplate.New("reviewTemplate")
-	reviewTemplate.Parse(reviewTemplateString)
-
-	os.MkdirAll("./content", os.ModePerm)
-	for _, l := range linkData {
-		reviewPostPath := "./content/" + l.Slug + ".md"
-		_, err := os.Stat(reviewPostPath)
-		if err != nil {
-			if os.IsNotExist(err) {
-
-				var buff bytes.Buffer
-
-				reviewTemplate.Execute(&buff, struct {
-					Title string
-					Link  string
-				}{
-					Title: l.Title,
-					Link:  l.Link,
-				})
-
-				os.WriteFile(reviewPostPath,
-					buff.Bytes(),
-					os.ModePerm,
-				)
-			}
-		}
-	}
 
 	e := echo.New()
 
@@ -303,13 +273,8 @@ func loginRequest(c echo.Context) error {
 
 func reviewPage(c echo.Context) error {
 	slugHash := c.Param("hash")
-	pathToRead := "./content/" + slugHash + ".md"
-	_, err := os.Stat("./content/" + slugHash + ".md")
-	if err != nil {
-		return err
-	}
-
-	fileData, _ := os.ReadFile(pathToRead)
+	pathToRead := filepath.Join("content", slugHash+".md")
+	fileData, _ := contentFS.ReadFile(pathToRead)
 
 	var meta struct {
 		Title string

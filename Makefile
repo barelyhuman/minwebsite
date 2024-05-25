@@ -23,6 +23,9 @@ devServer:
 dev:
 	$(MAKE) -j 2 devClient devServer
 
+g.content:
+	go run ./tools/content
+
 start:
 	PORT=${PORT} pm2 start ./app --name=${APP_NAME}
 
