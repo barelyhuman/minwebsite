@@ -63,7 +63,7 @@ func main() {
 
 	FlashMessages = NewFlashMessageContainer()
 
-	linkData := loadMinWebJSON()
+	linkData := getLinks("")
 
 	reviewTemplate := txtTemplate.New("reviewTemplate")
 	reviewTemplate.Parse(reviewTemplateString)
@@ -142,7 +142,7 @@ func main() {
 	e.POST("/login", loginRequest)
 	e.GET("/review/:hash", reviewPage)
 	e.GET("/about", aboutPage)
-	e.GET("/", homePage)
+	e.GET("/", createHomePageHandler())
 
 	adminGroupMux := e.Group("/admin")
 
@@ -340,37 +340,22 @@ func reviewPage(c echo.Context) error {
 	return nil
 }
 
-func homePage(c echo.Context) error {
-	linkData := []models.Site{}
-	DB.Find(&linkData)
+func createHomePageHandler() func(c echo.Context) error {
+	return func(c echo.Context) error {
+		categories := getCategories()
+		searchTerm := c.QueryParam("q")
+		linkData := getLinks(searchTerm)
 
-	categories := NewCategorySet()
-
-	searchTerm := c.QueryParam("q")
-
-	filteredData := []models.Site{}
-	for _, l := range linkData {
-		categories.Add(l.Category)
-		if len(searchTerm) == 0 {
-			filteredData = append(filteredData, l)
-		} else {
-			nameContains := strings.Contains(strings.ToLower(l.Title), strings.ToLower(searchTerm))
-			linkContains := strings.Contains(strings.ToLower(l.Link), strings.ToLower(searchTerm))
-			if nameContains || linkContains {
-				filteredData = append(filteredData, l)
-			}
-		}
+		return c.Render(200, "home", struct {
+			ErrorFlashes []string
+			Links        []models.Site
+			Categories   []string
+		}{
+			ErrorFlashes: FlashMessages.GetAll(c, ErrorType),
+			Links:        linkData,
+			Categories:   categories,
+		})
 	}
-
-	return c.Render(200, "home", struct {
-		ErrorFlashes []string
-		Links        []models.Site
-		Categories   []string
-	}{
-		ErrorFlashes: FlashMessages.GetAll(c, ErrorType),
-		Links:        filteredData,
-		Categories:   *categories,
-	})
 }
 
 func aboutPage(c echo.Context) error {
@@ -395,41 +380,6 @@ type EchoRenderer struct {
 
 func (t *EchoRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	return t.templates.ExecuteTemplate(w, name, data)
-}
-
-type CategorySet []string
-
-func NewCategorySet() *CategorySet {
-	return &CategorySet{}
-}
-
-func (cs *CategorySet) onIndex(item string) int {
-	for i, l := range *cs {
-		if l == item {
-			return i
-		}
-	}
-	return -1
-}
-
-func (cs *CategorySet) Has(item string) bool {
-	hasItem := cs.onIndex(item)
-	return hasItem > -1
-}
-
-func (cs *CategorySet) Add(item string) {
-	if cs.Has(item) {
-		return
-	}
-	*cs = append(*cs, item)
-}
-
-func (cs *CategorySet) Delete(item string) {
-	if cs.Has(item) {
-		return
-	}
-	index := cs.onIndex(item)
-	*cs = slices.Delete(*cs, index, index+1)
 }
 
 func loadMinWebJSON() (linkData []LinkItem) {
@@ -467,6 +417,7 @@ func InitDatabase() *gorm.DB {
 		log.Fatal(err)
 		return nil
 	}
+
 	if err := db.AutoMigrate(
 		&models.Token{},
 		&models.User{},
@@ -586,4 +537,26 @@ func addJobs(s gocron.Scheduler) {
 			syncLinks,
 		),
 	)
+}
+
+func getLinks(searchTerm string) []models.Site {
+	linkData := []models.Site{}
+	if len(searchTerm) > 0 {
+		searchTermNormalized := strings.Join(strings.Split(strings.ToLower(searchTerm), " "), "%")
+		DB.Where("title like ?", "%"+searchTermNormalized+"%").Or("link like ?", "%"+searchTermNormalized+"%").Find(&linkData)
+	} else {
+		DB.Find(&linkData)
+	}
+	return linkData
+}
+
+func getCategories() []string {
+	linkData := []models.Site{}
+	DB.Select("category").Group("category").Find(&linkData)
+
+	var categories []string
+	for _, i := range linkData {
+		categories = append(categories, i.Category)
+	}
+	return categories
 }

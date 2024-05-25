@@ -1,12 +1,12 @@
 [
   {
     "method": "echo_route_not_found",
-    "path": "/admin",
+    "path": "/admin/*",
     "name": "github.com/labstack/echo/v4.glob..func1"
   },
   {
     "method": "echo_route_not_found",
-    "path": "/admin/*",
+    "path": "/admin",
     "name": "github.com/labstack/echo/v4.glob..func1"
   },
   {
@@ -21,11 +21,6 @@
   },
   {
     "method": "GET",
-    "path": "/",
-    "name": "main.homePage"
-  },
-  {
-    "method": "GET",
     "path": "/login",
     "name": "main.loginPage"
   },
@@ -33,6 +28,11 @@
     "method": "POST",
     "path": "/login",
     "name": "main.loginRequest"
+  },
+  {
+    "method": "GET",
+    "path": "/",
+    "name": "main.main.createHomePageHandler.func6"
   },
   {
     "method": "echo_route_not_found",
