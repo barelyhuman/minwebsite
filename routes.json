@@ -1,12 +1,12 @@
 [
   {
     "method": "echo_route_not_found",
-    "path": "/admin",
+    "path": "/admin/*",
     "name": "github.com/labstack/echo/v4.glob..func1"
   },
   {
     "method": "echo_route_not_found",
-    "path": "/admin/*",
+    "path": "/admin",
     "name": "github.com/labstack/echo/v4.glob..func1"
   },
   {
