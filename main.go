@@ -45,6 +45,8 @@ var contentFS embed.FS
 //go:embed views/*
 var views embed.FS
 
+var isAdminEnabled bool
+
 const ErrorType = "error"
 
 var DB *gorm.DB
@@ -52,11 +54,14 @@ var FlashMessages *FlashMessage
 
 func main() {
 	godotenv.Load()
+	isAdminEnabled = bool(env.Get("ADMIN_ENABLED", "false") == "true")
 
 	scheduler, err := gocron.NewScheduler()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	defer scheduler.Shutdown()
 
 	DB = InitDatabase()
 	fmt.Println("Migrated database")
@@ -158,7 +163,6 @@ func main() {
 
 	writeRouteManifest(e)
 	gracefulShutdown(e)
-	scheduler.Shutdown()
 }
 
 func getRatelimiterConfig() middleware.RateLimiterConfig {
@@ -222,6 +226,10 @@ type LinkItem struct {
 }
 
 func loginPage(c echo.Context) error {
+	if !isAdminEnabled {
+		return c.Redirect(http.StatusSeeOther, "/404")
+	}
+
 	return c.Render(http.StatusOK, "login", struct {
 		ErrorFlashes []string
 		CSRFToken    interface{}
