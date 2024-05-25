@@ -18,10 +18,13 @@ devClient:
 	npm run dev
 
 devServer:
-	find *.go -type f | entr -sr "go run . --dev"
+	find **/*.{go,html,css}  | entr -sr "go run ."
 
 dev:
 	$(MAKE) -j 2 devClient devServer
+
+g.content:
+	go run ./tools/content
 
 start:
 	PORT=${PORT} pm2 start ./app --name=${APP_NAME}

@@ -12,3 +12,6 @@ app
 # env files
 .env*
 !.env.example
+
+
+*.sqlite3

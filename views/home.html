@@ -1,0 +1,72 @@
+{{define "home"}} {{template "header" .}}
+
+<div class="my-10" x-data="{ shownCategories: [], dispatched: false }">
+  <div class="flex flex-wrap justify-between items-baseline mb-10">
+    <div>
+      <form>
+        <input
+          name="q"
+          class="input"
+          placeholder="Search and press Enter"
+          x-data
+          x-init="$el.value = new URLSearchParams(window.location.search).get('q')"
+        />
+      </form>
+    </div>
+    <div class="flex gap-2">
+      {{ range .Categories }}
+      <form>
+        <label>
+          <input
+            type="checkbox"
+            value="{{.}}"
+            x-model="shownCategories"
+            class="w-4 h-4 text-black rounded-sm shadow outline-none border-zinc-200 checked:shadow-xl focus:ring-2 focus:ring-black focus:ring-offset-2"
+          />
+          <span class="ml-1">{{.}}</span>
+        </label>
+      </form>
+      {{end}}
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-4 items-start" x-masonry.poll.2500>
+    {{ range .Links }}
+    <template
+      x-if="shownCategories.length ? shownCategories.includes('{{.Category}}'): true"
+    >
+      <div
+        class="overflow-hidden text-white rounded-md border-2 group border-zinc-900"
+        x-data="{height: 250, color: '{{.BackgroundColor}}'}"
+        :style="{height:height+'px', backgroundColor: color}"
+        x-transition
+      >
+        <a
+          class="block w-full h-full transition duration-200 delay-75 group-hover:scale-75"
+          href="/review/{{.Slug}}"
+        >
+          <img
+            class="w-full h-full"
+            data-image="{{.ImageURL}}"
+            data-category="{{.Category}}"
+            x-intersect="$el.src = $el.dataset.image"
+            @load="
+          const ratio = $el.naturalHeight / $el.naturalWidth; 
+          height = $el.getBoundingClientRect().width * ratio;
+          if(dispatched){
+            console.log('already dispatched')
+            return 
+          }
+          dispatched = true
+          $dispatch('reload:masonry')
+          dispatched = false
+          "
+          />
+        </a>
+      </div>
+    </template>
+    {{end}}
+  </div>
+</div>
+
+{{template "footer"}} {{end}}
