@@ -24,7 +24,7 @@ make start
 
 go mod tidy
 make build
-env GOOS=linux GOARCH=amd64 go build -o app
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-linux-gnu-gcc  CXX=x86_64-linux-gnu-g++ go build -o app
 rsync -aP --delete ./app ./Makefile "${DEPLOY_HOST}:${APP_DIR}"
 
 ssh $DEPLOY_HOST "/bin/bash -c '$COMMANDS'"
