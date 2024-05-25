@@ -187,7 +187,7 @@ func gracefulShutdown(e *echo.Echo) {
 		defer stop()
 		// Start server
 		go func() {
-			if err := e.Start(":1323"); err != nil && err != http.ErrServerClosed {
+			if err := e.Start(getPort()); err != nil && err != http.ErrServerClosed {
 				e.Logger.Fatal("shutting down the server")
 			}
 		}()
@@ -200,7 +200,7 @@ func gracefulShutdown(e *echo.Echo) {
 			e.Logger.Fatal(err)
 		}
 	} else {
-		if err := e.Start(":1323"); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(getPort()); err != nil && err != http.ErrServerClosed {
 			e.Logger.Fatal("shutting down the server with err", err)
 		}
 	}
@@ -524,4 +524,14 @@ func getCategories() []string {
 		categories = append(categories, i.Category)
 	}
 	return categories
+}
+
+func getPort() string {
+	prefix := []byte(":")
+	port := []byte(env.Get("PORT", ":4532"))
+	port = bytes.TrimPrefix(port, prefix)
+	var buff bytes.Buffer
+	buff.Write(prefix)
+	buff.Write(port)
+	return buff.String()
 }
