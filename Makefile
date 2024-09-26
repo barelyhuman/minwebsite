@@ -10,7 +10,7 @@ dev:
 	pnpm dev
 
 start:
-	pm2 start --interpreter='$$NODE_INTERPRETER' --name=${APP_NAME} pnpm -- start --port=${PORT}
+	pm2 start --name=${APP_NAME} npm -- start --port=${PORT}
 
 stop:
 	pm2 stop ${APP_NAME}
