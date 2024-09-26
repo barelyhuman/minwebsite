@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+PROJECT_DIR="${SCRIPT_DIR}/.."
+
+cd $PROJECT_DIR
+. .env
+
+APP_DIR="/apps/minweb"
+APP_BIN="./bin/minweb"
+APP_NAME="minweb"
+PORT="4532"
+
+COMMANDS="""
+set -euxo pipefail
+mkdir -p ${APP_DIR}
+cd ${APP_DIR}
+source ~/.nvm/nvm.sh
+source .env
+npm i
+rm -rf dist
+mv .next-deploy dist
+make stop || true
+make kill || true
+make start
+"""
+
+make build
+scp ./package.json $DEPLOY_HOST:${APP_DIR}/package.json
+scp ./package-lock.json $DEPLOY_HOST:${APP_DIR}/package-lock.json
+scp -r ./dist $DEPLOY_HOST:${APP_DIR}/.next-deploy
+scp ./Makefile $DEPLOY_HOST:${APP_DIR}/Makefile
+
+ssh $DEPLOY_HOST "/bin/bash -c '$COMMANDS'"

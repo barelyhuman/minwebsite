@@ -1,0 +1,23 @@
+@import url(https://fonts.bunny.net/css?family=bad-script:400|inter:400);
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply text-zinc-50 bg-zinc-900;
+    font-size: 100%;
+    font-family: "Bad Script", handwriting;
+}
+
+a.link {
+    @apply text-inherit hover:text-white;
+}
+
+.cal {
+    font-family: "Inter", sans-serif;
+}
+
+.input {
+    @apply w-full p-2 pl-3 bg-transparent shadow rounded outline-offset-2 overflow-hidden border border-zinc-700 items-center gap-4;
+}
