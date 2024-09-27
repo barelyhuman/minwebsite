@@ -37,7 +37,13 @@ export default () => {
   return (
     <div class="p-10 mx-auto max-w-4xl">
       <div class="flex justify-end w-full">
-        <h1 class="font-sans text-sm text-zinc-600">minweb.site</h1>
+        <ul class="flex gap-2 items-center mx-2 font-sans text-xs">
+          <li>
+            <a class="text-zinc-600 hover:underline hover:underline-offset-4 hover:text-white" href="https://github.com/barelyhuman/minweb-public-data?tab=readme-ov-file#add-another-site">Add your site?</a>
+          </li>
+        </ul>
+
+        <h1 class="font-sans text-sm text-zinc-400">minweb.site</h1>
       </div>
       <div class="my-24">
         <h2 class="font-semibold">Recent</h2>
