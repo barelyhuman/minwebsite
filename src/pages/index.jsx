@@ -24,8 +24,7 @@ export default () => {
   }, [])
 
   const recents = sites
-    .slice()
-    .sort(
+    .toSorted(
       (x, y) => new Date(y.addedOn).getTime() - new Date(x.addedOn).getTime()
     )
     .slice(0, 4)
@@ -33,8 +32,7 @@ export default () => {
   const totalCount = sites.length
 
   const filteredSites = (searchTerm ? searcher(searchTerm) : sites)
-    .slice()
-    .sort((x, y) => x.title.localeCompare(y.title))
+    .toSorted((x, y) => x.title.localeCompare(y.title))
 
   return (
     <div class="p-10 mx-auto max-w-4xl">
