@@ -1,15 +1,13 @@
-import forms from "@tailwindcss/forms"
+import forms from '@tailwindcss/forms'
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/**/*.{js,tsx,jsx}"],
+  content: ['./src/**/*.{js,tsx,jsx}'],
   theme: {
     extend: {},
-    "fontFamily":{
-      "sans":"'Inter',sans-serif",
-    }
+    fontFamily: {
+      sans: "'Inter',sans-serif",
+    },
   },
-  plugins: [
-forms
-  ],
-};
+  plugins: [forms],
+}

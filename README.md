@@ -12,8 +12,8 @@ Minimal and Default JS Template for Adex
 ```sh
 ; npx degit barelyhuman/adex-default-template <project-name>
 ; cd <project-name>
-; npm i 
-# or yarn install 
+; npm i
+# or yarn install
 # or pnpm install
 ; npm run dev
 ```

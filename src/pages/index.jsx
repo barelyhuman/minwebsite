@@ -31,15 +31,21 @@ export default () => {
 
   const totalCount = sites.length
 
-  const filteredSites = (searchTerm ? searcher(searchTerm) : sites)
-    .toSorted((x, y) => x.title.localeCompare(y.title))
+  const filteredSites = (searchTerm ? searcher(searchTerm) : sites).toSorted(
+    (x, y) => x.title.localeCompare(y.title)
+  )
 
   return (
     <div class="p-10 mx-auto max-w-4xl">
       <div class="flex justify-end w-full">
         <ul class="flex gap-2 items-center mx-2 font-sans text-xs">
           <li>
-            <a class="text-zinc-600 hover:underline hover:underline-offset-4 hover:text-white" href="https://github.com/barelyhuman/minweb-public-data?tab=readme-ov-file#add-another-site">Add your site?</a>
+            <a
+              class="text-zinc-600 hover:underline hover:underline-offset-4 hover:text-white"
+              href="https://github.com/barelyhuman/minweb-public-data?tab=readme-ov-file#add-another-site"
+            >
+              Add your site?
+            </a>
           </li>
         </ul>
 
