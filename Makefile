@@ -2,15 +2,16 @@ include .env
 export
 
 APP_NAME="minweb"
+NODE_PATH = $(shell bash -c 'source ~/.nvm/nvm.sh && nvm which 20')
 
 build:
-	pnpm build
+	npm run build
 
 dev:
-	pnpm dev
+	npm run dev
 
 start:
-	pm2 start --name=${APP_NAME} npm -- start --port=${PORT}
+	pm2 start --name=${APP_NAME} --interpreter=$(NODE_PATH)  dist/server/index.js -- --port=${PORT}
 
 stop:
 	pm2 stop ${APP_NAME}
