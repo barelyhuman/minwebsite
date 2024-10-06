@@ -17,7 +17,7 @@ mkdir -p ${APP_DIR}
 cd ${APP_DIR}
 source ~/.nvm/nvm.sh
 source .env
-npm i
+pnpm i
 rm -rf dist
 mv .next-deploy dist
 make stop || true
