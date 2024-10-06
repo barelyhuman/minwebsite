@@ -1,17 +1,14 @@
 import type { ClientRequest, ServerResponse } from 'node:http'
+import { createScheduledMonitor } from '../lib/createCacheMonitor.js'
+import { fetchFromCache } from '../lib/fetchFromCache.js'
+import { updateSiteCache } from '../lib/updateSiteCache.js'
+import { appConfig } from '../lib/env.js'
+
+const startCacheMonitor = createScheduledMonitor(updateSiteCache)
 
 export default async (req: ClientRequest, res: ServerResponse) => {
-  const response = await fetch(
-    'https://ungh.cc/repos/barelyhuman/minweb-public-data/files/main/data/links.json'
-  ).then(d => d.json())
-
-  let data = []
-  try {
-    data = JSON.parse(response.file.contents)
-  } catch (err) {
-    console.error('Failed to get data')
-  }
-
+  const data = await fetchFromCache(() => updateSiteCache())
+  startCacheMonitor(appConfig.updateDelay)
   res.setHeader('Content-type', 'application/json')
   return res.end(JSON.stringify(data))
 }

@@ -16,10 +16,13 @@ set -euxo pipefail
 mkdir -p ${APP_DIR}
 cd ${APP_DIR}
 source ~/.nvm/nvm.sh
+nvm use 20
 source .env
 pnpm i
 rm -rf dist
 mv .next-deploy dist
+pnpm db:latest
+nvm use default
 make stop || true
 make kill || true
 make start
@@ -29,6 +32,8 @@ make build
 scp ./package.json $DEPLOY_HOST:${APP_DIR}/package.json
 scp ./package-lock.json $DEPLOY_HOST:${APP_DIR}/package-lock.json
 scp ./.nvmrc $DEPLOY_HOST:${APP_DIR}/.nvmrc
+scp -r ./migrations $DEPLOY_HOST:${APP_DIR}/migrations
+scp -r ./knexfile.js $DEPLOY_HOST:${APP_DIR}/knexfile.js
 scp -r ./dist $DEPLOY_HOST:${APP_DIR}/.next-deploy
 scp ./Makefile $DEPLOY_HOST:${APP_DIR}/Makefile
 

@@ -23,10 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
-
-# yalc 
+# yalc
 yalc.lock
 .yalc
 
 .env*
 !.env.example
+
+*.sqlite3
+*.sqlite3-*
