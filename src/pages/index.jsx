@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'preact/hooks'
-import { formatDistanceToNow } from 'date-fns/formatDistanceToNow'
 import { get } from '@dumbjs/pick/get'
+import { formatDistanceToNow } from 'date-fns/formatDistanceToNow'
 
-import { signal } from '@preact/signals'
-import { computed } from '@preact/signals'
-import { Component } from 'preact'
+import { computed, signal } from '@preact/signals'
+import { Image } from '../components/Image'
 
 /**
  * @type {ReturnType<typeof microsearch>}
@@ -34,7 +32,7 @@ const recents = computed(() =>
 
 const containerWidth = signal(900)
 const offset = { value: 8 }
-const columns = { value: 3 }
+const columns = signal(3)
 
 const bentoPositions = computed(() => {
   const withPositions = []
@@ -59,9 +57,8 @@ const bentoPositions = computed(() => {
     let top = 0
     let left = prevLeft + prevWidth + (indAsNum === 0 ? 0 : offset.value / 2)
 
-    console.log({ indAsNum, prevByCol })
     if (prevByCol) {
-      top = prevByCol.top + prevByCol.height + offset.value / 2
+      top = prevByCol.top + prevByCol.height + offset.value
     }
 
     const prevRow = Math.floor((indAsNum - 1) / columns.value)
@@ -84,12 +81,46 @@ const bentoPositions = computed(() => {
 
 export default () => {
   return (
-    <div class="p-10 mx-auto max-w-4xl">
+    <div
+      class="p-10 mx-auto max-w-4xl"
+      ref={node => {
+        if (!node) return
+        let minWidth = 250
+        const resizer = debounce(() => {
+          let usableMinWidth = minWidth
+          const computedStyle = getComputedStyle(node)
+          const widthWithoutPadding =
+            node.getBoundingClientRect().width -
+            (parseFloat(computedStyle.paddingLeft) +
+              parseFloat(computedStyle.paddingRight))
+
+          const colsPossible = Math.floor(widthWithoutPadding / minWidth)
+          const un_Width = offset.value * colsPossible * 2
+          let colsWithOffset = Math.floor(
+            (widthWithoutPadding - un_Width) / minWidth
+          )
+
+          if (colsWithOffset <= 1) {
+            usableMinWidth = widthWithoutPadding - un_Width
+            colsWithOffset = 1
+          }
+
+          containerWidth.value = widthWithoutPadding - un_Width
+          columns.value = colsWithOffset
+        }, 350)
+
+        window.addEventListener('resize', () => {
+          resizer()
+        })
+
+        resizer()
+      }}
+    >
       <div class="flex justify-end w-full">
         <ul class="flex gap-2 items-center mx-2 font-sans text-xs">
           <li>
             <a
-              class="text-zinc-600 hover:underline hover:underline-offset-4 hover:text-white"
+              class="text-zinc-600 hover:underline hover:underline-offset-4 hover:text-black"
               href="https://github.com/barelyhuman/minweb-public-data?tab=readme-ov-file#add-another-site"
             >
               Add your site?
@@ -133,16 +164,18 @@ export default () => {
             )
             return (
               <div
-                class="inline-flex absolute justify-center items-center text-zinc-500"
+                class="inline-flex absolute justify-center items-center hover:cursor-pointer text-zinc-500"
                 style={{
                   ...pos,
                 }}
               >
-                <Image
-                  src={d.imageURL}
-                  className="h-full rounded-md"
-                  classNameOnLoad="border border-black"
-                />
+                <a href={d.link} class="transition-all transition hover:px-1">
+                  <Image
+                    src={d.imageURL}
+                    className="h-full rounded-md"
+                    classNameOnLoad="border-2 border-black"
+                  />
+                </a>
               </div>
             )
           })}
@@ -166,47 +199,12 @@ function microsearch(collection, paths) {
   }
 }
 
-class Image extends Component {
-  state = {
-    loaded: false,
-  }
-
-  inview(entries, observer) {
-    entries.forEach(entry => {
-      if (!entry.intersectionRatio) return
-
-      entry.target.addEventListener('load', this.loading.bind(this))
-      entry.target.src = this.props.src
-      observer.unobserve(entry.target)
-    })
-  }
-
-  loading(event) {
-    if (event.target.complete)
-      this.setState({
-        loaded: true,
-      })
-  }
-
-  componentDidMount() {
-    this.setState({
-      loaded: false,
-    })
-
-    const observer = new IntersectionObserver(this.inview.bind(this))
-
-    observer.observe(this.element)
-  }
-
-  render() {
-    const { loaded } = this.state
-    const classList = (this.props.class ?? this.props.className)
-      .split(' ')
-      .filter(Boolean)
-      .concat(loaded ? this.props.classNameOnLoad.split(' ') : [])
-      .join(' ')
-    return (
-      <img className={classList} ref={element => (this.element = element)} />
-    )
+function debounce(fn, delay) {
+  let handler
+  return (...args) => {
+    if (handler) clearTimeout(handler)
+    handler = setTimeout(() => {
+      fn(...args)
+    }, delay)
   }
 }

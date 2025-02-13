@@ -8,7 +8,7 @@ body {
 }
 
 a.link {
-  @apply text-inherit hover:text-white;
+  @apply text-inherit hover:text-black hover:underline hover:underline-offset-4;
 }
 
 .cal {
