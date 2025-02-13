@@ -3,9 +3,8 @@
 @tailwind utilities;
 
 body {
-  @apply text-zinc-50 bg-zinc-900;
+  @apply text-zinc-800 bg-zinc-50;
   font-size: 100%;
-  font-family: 'Bad Script', handwriting;
 }
 
 a.link {

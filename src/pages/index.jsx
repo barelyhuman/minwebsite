@@ -2,39 +2,87 @@ import { useEffect, useState } from 'preact/hooks'
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow'
 import { get } from '@dumbjs/pick/get'
 
+import { signal } from '@preact/signals'
+import { computed } from '@preact/signals'
+import { Component } from 'preact'
+
 /**
  * @type {ReturnType<typeof microsearch>}
  */
 let searcher
 
+const sites$ = signal([])
+
 async function getData() {
   const response = await fetch('/api/data').then(d => d.json())
-
   searcher = microsearch(response, ['title', 'link'])
-
   return response
 }
 
-export default () => {
-  const [sites, setSites] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
+if (typeof window != 'undefined') {
+  const data = await getData()
+  sites$.value = data.toSorted((x, y) => x.title.localeCompare(y.title))
+}
 
-  useEffect(() => {
-    getData().then(d => setSites(d))
-  }, [])
-
-  const recents = sites
+const recents = computed(() =>
+  sites$.value
     .toSorted(
       (x, y) => new Date(y.addedOn).getTime() - new Date(x.addedOn).getTime()
     )
     .slice(0, 4)
+)
 
-  const totalCount = sites.length
+const containerWidth = signal(900)
+const offset = { value: 8 }
+const columns = { value: 3 }
 
-  const filteredSites = (searchTerm ? searcher(searchTerm) : sites).toSorted(
-    (x, y) => x.title.localeCompare(y.title)
-  )
+const bentoPositions = computed(() => {
+  const withPositions = []
+  for (let index in sites$.value) {
+    const indAsNum = Number(index)
+    const d = sites$.value[indAsNum]
+    const prevLeft = withPositions[indAsNum - 1]
+      ? withPositions[indAsNum - 1].left
+      : 0
+    const prevWidth = withPositions[indAsNum - 1]
+      ? withPositions[indAsNum - 1].width
+      : 0
 
+    const originalHeight = d.dimensions.height ?? 543
+    const originalWidth = d.dimensions.width ?? 1039
+
+    const ratio = originalHeight / originalWidth
+    const widthByContainer = containerWidth.value / columns.value - offset.value
+    const heightByContainer = widthByContainer * ratio
+
+    const prevByCol = withPositions[indAsNum - columns.value]
+    let top = 0
+    let left = prevLeft + prevWidth + (indAsNum === 0 ? 0 : offset.value / 2)
+
+    console.log({ indAsNum, prevByCol })
+    if (prevByCol) {
+      top = prevByCol.top + prevByCol.height + offset.value / 2
+    }
+
+    const prevRow = Math.floor((indAsNum - 1) / columns.value)
+    const currentRow = Math.floor(indAsNum / columns.value)
+
+    let columnCountBroken = currentRow > prevRow ? true : false
+    if (columnCountBroken) {
+      left = 0
+    }
+
+    withPositions.push({
+      top,
+      left,
+      height: heightByContainer,
+      width: widthByContainer,
+    })
+  }
+  return withPositions
+})
+
+export default () => {
   return (
     <div class="p-10 mx-auto max-w-4xl">
       <div class="flex justify-end w-full">
@@ -54,7 +102,7 @@ export default () => {
       <div class="my-24">
         <h2 class="font-semibold">Recent</h2>
         <ul class="flex flex-col gap-4 mt-8 w-full">
-          {recents.map(d => {
+          {recents.value.map(d => {
             return (
               <li class="w-full text-zinc-500">
                 <a
@@ -73,40 +121,32 @@ export default () => {
           })}
         </ul>
       </div>
-
       <div class="my-24">
-        <div class="flex flex-wrap gap-2 justify-between">
-          <h2 class="font-semibold">
-            All <span class="text-zinc-500">( {totalCount} )</span>
-          </h2>
-          <div class="flex min-w-56">
-            <input
-              name="search"
-              class="transition-colors duration-300 input focus:ring-0 focus:border-emerald-400"
-              placeholder="search"
-              ref={node => {
-                if (!node) return
-                node.addEventListener('keyup', e => {
-                  setSearchTerm(e.target.value)
-                })
-              }}
-            />
-          </div>
-        </div>
-        <ul class="flex flex-col gap-4 mt-8">
-          {filteredSites.map(d => {
+        <h2 class="font-semibold">Gallery</h2>
+        <div class="relative gap-2 mt-4 w-full">
+          {sites$.value.map((d, ind) => {
+            const pos = Object.fromEntries(
+              Object.entries(bentoPositions.value[ind]).map(d => [
+                d[0],
+                d[1] + 'px',
+              ])
+            )
             return (
-              <li class="w-full text-zinc-500">
-                <a
-                  href={d.link}
-                  class="relative w-full transition duration-300 link"
-                >
-                  {d.title}
-                </a>
-              </li>
+              <div
+                class="inline-flex absolute justify-center items-center text-zinc-500"
+                style={{
+                  ...pos,
+                }}
+              >
+                <Image
+                  src={d.imageURL}
+                  className="h-full rounded-md"
+                  classNameOnLoad="border border-black"
+                />
+              </div>
             )
           })}
-        </ul>
+        </div>
       </div>
     </div>
   )
@@ -123,5 +163,50 @@ function microsearch(collection, paths) {
         val[0].find(t => t.toLowerCase().includes(term.toLowerCase()))
       )
       .map(matches => collection[matches[1]])
+  }
+}
+
+class Image extends Component {
+  state = {
+    loaded: false,
+  }
+
+  inview(entries, observer) {
+    entries.forEach(entry => {
+      if (!entry.intersectionRatio) return
+
+      entry.target.addEventListener('load', this.loading.bind(this))
+      entry.target.src = this.props.src
+      observer.unobserve(entry.target)
+    })
+  }
+
+  loading(event) {
+    if (event.target.complete)
+      this.setState({
+        loaded: true,
+      })
+  }
+
+  componentDidMount() {
+    this.setState({
+      loaded: false,
+    })
+
+    const observer = new IntersectionObserver(this.inview.bind(this))
+
+    observer.observe(this.element)
+  }
+
+  render() {
+    const { loaded } = this.state
+    const classList = (this.props.class ?? this.props.className)
+      .split(' ')
+      .filter(Boolean)
+      .concat(loaded ? this.props.classNameOnLoad.split(' ') : [])
+      .join(' ')
+    return (
+      <img className={classList} ref={element => (this.element = element)} />
+    )
   }
 }
