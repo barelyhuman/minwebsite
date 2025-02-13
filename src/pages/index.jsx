@@ -9,7 +9,13 @@ import { Image } from '../components/Image'
  */
 let searcher
 
-const sites$ = signal([])
+const allSites$ = signal([])
+
+const searchTerm = signal('')
+
+const sites$ = computed(() => {
+  return !searchTerm.value.length ? allSites$.value : searcher(searchTerm.value)
+})
 
 const MIN_CARD_WIDTH = 280
 
@@ -21,7 +27,7 @@ async function getData() {
 
 if (typeof window != 'undefined') {
   const data = await getData()
-  sites$.value = data.toSorted((x, y) => x.title.localeCompare(y.title))
+  allSites$.value = data.toSorted((x, y) => x.title.localeCompare(y.title))
 }
 
 const recents = computed(() =>
@@ -84,7 +90,7 @@ const bentoPositions = computed(() => {
 export default () => {
   return (
     <div
-      class="p-10 mx-auto max-w-screen"
+      class="p-2 mx-auto sm:p-5 md:p-10 max-w-screen"
       ref={node => {
         if (!node) return
         const resizer = debounce(() => {
