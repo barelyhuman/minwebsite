@@ -11,7 +11,7 @@ let searcher
 
 const sites$ = signal([])
 
-const MIN_CARD_WIDTH = 250
+const MIN_CARD_WIDTH = 280
 
 async function getData() {
   const response = await fetch('/api/data').then(d => d.json())
@@ -84,7 +84,7 @@ const bentoPositions = computed(() => {
 export default () => {
   return (
     <div
-      class="p-10 mx-auto max-w-4xl"
+      class="p-10 mx-auto max-w-screen"
       ref={node => {
         if (!node) return
         const resizer = debounce(() => {

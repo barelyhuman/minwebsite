@@ -13,10 +13,6 @@ export default defineConfig({
         providers: [providers.bunny()],
         families: [
           {
-            name: 'Bad Script',
-            weights: ['400'],
-          },
-          {
             name: 'Inter',
             weights: ['400'],
             styles: ['normal'],
