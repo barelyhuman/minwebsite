@@ -11,6 +11,8 @@ let searcher
 
 const sites$ = signal([])
 
+const MIN_CARD_WIDTH = 250
+
 async function getData() {
   const response = await fetch('/api/data').then(d => d.json())
   searcher = microsearch(response, ['title', 'link'])
@@ -50,7 +52,7 @@ const bentoPositions = computed(() => {
     const originalWidth = d.dimensions.width ?? 1039
 
     const ratio = originalHeight / originalWidth
-    const widthByContainer = containerWidth.value / columns.value - offset.value
+    const widthByContainer = containerWidth.value / columns.value
     const heightByContainer = widthByContainer * ratio
 
     const prevByCol = withPositions[indAsNum - columns.value]
@@ -85,27 +87,23 @@ export default () => {
       class="p-10 mx-auto max-w-4xl"
       ref={node => {
         if (!node) return
-        let minWidth = 250
         const resizer = debounce(() => {
-          let usableMinWidth = minWidth
           const computedStyle = getComputedStyle(node)
           const widthWithoutPadding =
             node.getBoundingClientRect().width -
             (parseFloat(computedStyle.paddingLeft) +
               parseFloat(computedStyle.paddingRight))
 
-          const colsPossible = Math.floor(widthWithoutPadding / minWidth)
-          const un_Width = offset.value * colsPossible * 2
+          const negationWidthForOffset = offset.value
           let colsWithOffset = Math.floor(
-            (widthWithoutPadding - un_Width) / minWidth
+            (widthWithoutPadding - negationWidthForOffset) / MIN_CARD_WIDTH
           )
 
           if (colsWithOffset <= 1) {
-            usableMinWidth = widthWithoutPadding - un_Width
             colsWithOffset = 1
           }
 
-          containerWidth.value = widthWithoutPadding - un_Width
+          containerWidth.value = widthWithoutPadding - negationWidthForOffset
           columns.value = colsWithOffset
         }, 350)
 
@@ -172,7 +170,7 @@ export default () => {
                 <a href={d.link} class="transition-all transition hover:px-1">
                   <Image
                     src={d.imageURL}
-                    className="h-full rounded-md"
+                    className="rounded-md"
                     classNameOnLoad="border-2 border-black"
                   />
                 </a>
