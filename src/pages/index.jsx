@@ -9,13 +9,7 @@ import { Image } from '../components/Image'
  */
 let searcher
 
-const allSites$ = signal([])
-
-const searchTerm = signal('')
-
-const sites$ = computed(() => {
-  return !searchTerm.value.length ? allSites$.value : searcher(searchTerm.value)
-})
+const sites$ = signal([])
 
 const MIN_CARD_WIDTH = 280
 
@@ -26,8 +20,10 @@ async function getData() {
 }
 
 if (typeof window != 'undefined') {
-  const data = await getData()
-  allSites$.value = data.toSorted((x, y) => x.title.localeCompare(y.title))
+  ;(async () => {
+    const data = await getData()
+    sites$.value = data.sort((x, y) => x.title.localeCompare(y.title))
+  })()
 }
 
 const recents = computed(() =>
