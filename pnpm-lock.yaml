@@ -41,7 +41,7 @@ importers:
         version: 20.16.10
       adex:
         specifier: github:barelyhuman/adex#path:adex
-        version: https://codeload.github.com/barelyhuman/adex/tar.gz/70d2035374adc6810a9bcd7f4516bf55ef99fb2b#path:adex(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.17)(astring@1.9.0)(preact@10.24.2)(react@16.14.0)
+        version: https://codeload.github.com/barelyhuman/adex/tar.gz/cf6e4617c5ddd12abce518d4bd1fe74340a672d3#path:adex(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.17)(astring@1.9.0)(preact@10.24.2)(react@16.14.0)
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.20(postcss@8.4.47)
@@ -537,8 +537,8 @@ packages:
   adex-adapter-node@0.0.17:
     resolution: {integrity: sha512-AoYh81196oIiA1KqLanJKRGL+4mHptnzx7Ig4tG1NnMz756lZmSZPvSyt0luKtbz7nL53pHtY9euaHqdWDMmNw==, tarball: https://registry.npmjs.org/adex-adapter-node/-/adex-adapter-node-0.0.17.tgz}
 
-  adex@https://codeload.github.com/barelyhuman/adex/tar.gz/70d2035374adc6810a9bcd7f4516bf55ef99fb2b#path:adex:
-    resolution: {path: adex, tarball: https://codeload.github.com/barelyhuman/adex/tar.gz/70d2035374adc6810a9bcd7f4516bf55ef99fb2b}
+  adex@https://codeload.github.com/barelyhuman/adex/tar.gz/cf6e4617c5ddd12abce518d4bd1fe74340a672d3#path:adex:
+    resolution: {path: adex, tarball: https://codeload.github.com/barelyhuman/adex/tar.gz/cf6e4617c5ddd12abce518d4bd1fe74340a672d3}
     version: 0.0.18-alpha.0
     peerDependencies:
       '@preact/preset-vite': '>=2.8.2'
@@ -1847,7 +1847,7 @@ snapshots:
 
   adex-adapter-node@0.0.17: {}
 
-  adex@https://codeload.github.com/barelyhuman/adex/tar.gz/70d2035374adc6810a9bcd7f4516bf55ef99fb2b#path:adex(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.17)(astring@1.9.0)(preact@10.24.2)(react@16.14.0):
+  adex@https://codeload.github.com/barelyhuman/adex/tar.gz/cf6e4617c5ddd12abce518d4bd1fe74340a672d3#path:adex(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.17)(astring@1.9.0)(preact@10.24.2)(react@16.14.0):
     dependencies:
       '@barelyhuman/tiny-use': 0.0.2
       '@dumbjs/preland': 0.0.2(astring@1.9.0)
