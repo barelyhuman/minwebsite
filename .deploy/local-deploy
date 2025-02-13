@@ -27,7 +27,7 @@ make start
 
 make build
 scp ./package.json $DEPLOY_HOST:${APP_DIR}/package.json
-scp ./package-lock.json $DEPLOY_HOST:${APP_DIR}/package-lock.json
+scp ./pnpm-lock.yaml $DEPLOY_HOST:${APP_DIR}/pnpm-lock.yaml
 scp ./.nvmrc $DEPLOY_HOST:${APP_DIR}/.nvmrc
 scp -r ./dist $DEPLOY_HOST:${APP_DIR}/.next-deploy
 scp ./Makefile $DEPLOY_HOST:${APP_DIR}/Makefile
