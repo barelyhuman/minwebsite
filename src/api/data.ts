@@ -12,6 +12,10 @@ export default async (req: ClientRequest, res: ServerResponse) => {
     console.error('Failed to get data')
   }
 
+  const filterItemsStillInProcessing = data.filter(d => {
+    return d['dimensions'] && d['imageURL'] && d['addedOn']
+  })
+
   res.setHeader('Content-type', 'application/json')
-  return res.end(JSON.stringify(data))
+  return res.end(JSON.stringify(filterItemsStillInProcessing))
 }
