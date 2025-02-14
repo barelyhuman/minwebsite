@@ -94,37 +94,7 @@ export default () => {
   useDefaultHead()
 
   return (
-    <div
-      class="p-2 mx-auto sm:p-5 md:p-10 max-w-screen"
-      ref={node => {
-        if (!node) return
-        const resizer = debounce(() => {
-          const computedStyle = getComputedStyle(node)
-          const widthWithoutPadding =
-            node.getBoundingClientRect().width -
-            (parseFloat(computedStyle.paddingLeft) +
-              parseFloat(computedStyle.paddingRight))
-
-          const negationWidthForOffset = offset.value
-          let colsWithOffset = Math.floor(
-            (widthWithoutPadding - negationWidthForOffset) / MIN_CARD_WIDTH
-          )
-
-          if (colsWithOffset <= 1) {
-            colsWithOffset = 1
-          }
-
-          containerWidth.value = widthWithoutPadding - negationWidthForOffset
-          columns.value = colsWithOffset
-        }, 350)
-
-        window.addEventListener('resize', () => {
-          resizer()
-        })
-
-        resizer()
-      }}
-    >
+    <div class="p-2 mx-auto sm:p-5 md:p-10 max-w-screen" ref={onGridMount()}>
       <div class="flex justify-end w-full">
         <ul class="flex gap-2 items-center mx-2 font-sans text-xs">
           <li>
@@ -192,6 +162,40 @@ export default () => {
       </div>
     </div>
   )
+}
+
+const listenToContainerBoundaries = node => {
+  const computedStyle = getComputedStyle(node)
+  const widthWithoutPadding =
+    node.getBoundingClientRect().width -
+    (parseFloat(computedStyle.paddingLeft) +
+      parseFloat(computedStyle.paddingRight))
+
+  const negationWidthForOffset = offset.value
+  let colsWithOffset = Math.floor(
+    (widthWithoutPadding - negationWidthForOffset) / MIN_CARD_WIDTH
+  )
+
+  if (colsWithOffset <= 1) {
+    colsWithOffset = 1
+  }
+
+  containerWidth.value = widthWithoutPadding - negationWidthForOffset
+  columns.value = colsWithOffset
+}
+
+function onGridMount() {
+  const debouncedListenToContainerBoundaries = debounce(
+    listenToContainerBoundaries,
+    350
+  )
+  return node => {
+    if (!node) return
+    window.addEventListener('resize', () => {
+      debouncedListenToContainerBoundaries(node)
+    })
+    debouncedListenToContainerBoundaries(node)
+  }
 }
 
 function microsearch(collection, paths) {
