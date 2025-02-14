@@ -1,5 +1,6 @@
 import { get } from '@dumbjs/pick/get'
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow'
+import { useMeta, useTitle } from 'adex/head'
 
 import { computed, signal } from '@preact/signals'
 import { Image } from '../components/Image'
@@ -39,51 +40,59 @@ const offset = { value: 8 }
 const columns = signal(3)
 
 const bentoPositions = computed(() => {
-  const withPositions = []
-  for (let index in sites$.value) {
-    const indAsNum = Number(index)
-    const d = sites$.value[indAsNum]
-    const prevLeft = withPositions[indAsNum - 1]
-      ? withPositions[indAsNum - 1].left
-      : 0
-    const prevWidth = withPositions[indAsNum - 1]
-      ? withPositions[indAsNum - 1].width
-      : 0
+  const sites = sites$.value
+  const containerW = containerWidth.value
+  const cols = columns.value
+  const offsetVal = offset.value
+  const count = sites.length
+  const cardWidth = containerW / cols
+  const withPositions = new Array(count)
 
+  for (let i = 0; i < count; i++) {
+    const d = sites[i]
     const originalHeight = d.dimensions.height ?? 543
     const originalWidth = d.dimensions.width ?? 1039
-
     const ratio = originalHeight / originalWidth
-    const widthByContainer = containerWidth.value / columns.value
-    const heightByContainer = widthByContainer * ratio
+    const heightByContainer = cardWidth * ratio
 
-    const prevByCol = withPositions[indAsNum - columns.value]
+    let left = 0
     let top = 0
-    let left = prevLeft + prevWidth + (indAsNum === 0 ? 0 : offset.value / 2)
 
-    if (prevByCol) {
-      top = prevByCol.top + prevByCol.height + offset.value
-    }
-
-    const prevRow = Math.floor((indAsNum - 1) / columns.value)
-    const currentRow = Math.floor(indAsNum / columns.value)
-
-    let columnCountBroken = currentRow > prevRow ? true : false
-    if (columnCountBroken) {
+    // Calculate horizontal position:
+    if (i % cols !== 0) {
+      const prev = withPositions[i - 1]
+      left = prev.left + prev.width + offsetVal / 2
+    } else {
       left = 0
     }
 
-    withPositions.push({
+    // Calculate vertical position if not in the first row:
+    if (i >= cols) {
+      const prevByCol = withPositions[i - cols]
+      top = prevByCol.top + prevByCol.height + offsetVal
+    }
+
+    withPositions[i] = {
       top,
       left,
       height: heightByContainer,
-      width: widthByContainer,
-    })
+      width: cardWidth,
+    }
   }
   return withPositions
 })
 
+function useDefaultHead() {
+  useTitle('minweb.site | Minimal Websites Gallery')
+  useMeta({
+    name: 'viewport',
+    content: 'width=device-width, initial-scale=1.0',
+  })
+}
+
 export default () => {
+  useDefaultHead()
+
   return (
     <div
       class="p-2 mx-auto sm:p-5 md:p-10 max-w-screen"
