@@ -26,6 +26,9 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
+      popmotion:
+        specifier: ^11.0.5
+        version: 11.0.5
       preact:
         specifier: ^10.22.1
         version: 10.24.2
@@ -802,6 +805,9 @@ packages:
   fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==, tarball: https://registry.npmjs.org/fraction.js/-/fraction.js-4.3.7.tgz}
 
+  framesync@6.1.2:
+    resolution: {integrity: sha512-jBTqhX6KaQVDyus8muwZbBeGGP0XgujBRbQ7gM7BRdS3CadCZIHiawyzYLnafYcvZIh5j8WE7cxZKFn7dXhu9g==, tarball: https://registry.npmjs.org/framesync/-/framesync-6.1.2.tgz}
+
   fs-minipass@2.1.0:
     resolution: {integrity: sha512-V/JgOLFCS+R6Vcq0slCuaeWEdNC3ouDlJMNIsacH2VtALiu9mV4LPrHc5cDl8k5aw6J8jwgWWpiTo5RYhmIzvg==, tarball: https://registry.npmjs.org/fs-minipass/-/fs-minipass-2.1.0.tgz}
     engines: {node: '>= 8'}
@@ -853,6 +859,9 @@ packages:
   he@1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==, tarball: https://registry.npmjs.org/he/-/he-1.2.0.tgz}
     hasBin: true
+
+  hey-listen@1.0.8:
+    resolution: {integrity: sha512-COpmrF2NOg4TBWUJ5UVyaCU2A88wEMkUPK4hNqyCkqHbxT92BbvfjoSozkAIIm6XhicGlJHhFdullInrdhwU8Q==, tarball: https://registry.npmjs.org/hey-listen/-/hey-listen-1.0.8.tgz}
 
   hoofd@1.7.1:
     resolution: {integrity: sha512-G+RUtbwR/nPRoJu33Fu/agPXax3J3tRZvs/AZ/8eWWqXPfAvhOWETBJRsRZC2dIzJvXZnMiO+6ui5vi+ftKRqw==, tarball: https://registry.npmjs.org/hoofd/-/hoofd-1.7.1.tgz}
@@ -1112,6 +1121,9 @@ packages:
   pkg-types@1.2.0:
     resolution: {integrity: sha512-+ifYuSSqOQ8CqP4MbZA5hDpb97n3E8SVWdJe+Wms9kj745lmd3b7EZJiqvmLwAlmRfjrI7Hi5z3kdBJ93lFNPA==, tarball: https://registry.npmjs.org/pkg-types/-/pkg-types-1.2.0.tgz}
 
+  popmotion@11.0.5:
+    resolution: {integrity: sha512-la8gPM1WYeFznb/JqF4GiTkRRPZsfaj2+kCxqQgr2MJylMmIKUwBfWW8Wa5fml/8gmtlD5yI01MP1QCZPWmppA==, tarball: https://registry.npmjs.org/popmotion/-/popmotion-11.0.5.tgz}
+
   postcss-import@15.1.0:
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==, tarball: https://registry.npmjs.org/postcss-import/-/postcss-import-15.1.0.tgz}
     engines: {node: '>=14.0.0'}
@@ -1283,6 +1295,9 @@ packages:
     resolution: {integrity: sha512-dOESqjYr96iWYylGObzd39EuNTa5VJxyvVAEm5Jnh7KGo75V43Hk1odPQkNDyXNmUR6k+gEiDVXnjB8HJ3crXw==, tarball: https://registry.npmjs.org/strip-final-newline/-/strip-final-newline-3.0.0.tgz}
     engines: {node: '>=12'}
 
+  style-value-types@5.1.2:
+    resolution: {integrity: sha512-Vs9fNreYF9j6W2VvuDTP7kepALi7sk0xtk2Tu8Yxi9UoajJdEVpNpCov0HsLTqXvNGKX+Uv09pkozVITi1jf3Q==, tarball: https://registry.npmjs.org/style-value-types/-/style-value-types-5.1.2.tgz}
+
   sucrase@3.35.0:
     resolution: {integrity: sha512-8EbVDiu9iN/nESwxeSxDKe0dunta1GOlHufmSSXxMD2z2/tMZpDMpvXQGsc+ajGo8y2uYUmixaSRUc/QPoQ0GA==, tarball: https://registry.npmjs.org/sucrase/-/sucrase-3.35.0.tgz}
     engines: {node: '>=16 || 14 >=14.17'}
@@ -1330,6 +1345,9 @@ packages:
 
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==, tarball: https://registry.npmjs.org/ts-interface-checker/-/ts-interface-checker-0.1.13.tgz}
+
+  tslib@2.4.0:
+    resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==, tarball: https://registry.npmjs.org/tslib/-/tslib-2.4.0.tgz}
 
   type-detect@4.1.0:
     resolution: {integrity: sha512-Acylog8/luQ8L7il+geoSxhEkazvkslg7PSNKOX59mbB9cOveP5aq9h74Y7YU8yDpJwetzQQrfIwtf4Wp4LKcw==, tarball: https://registry.npmjs.org/type-detect/-/type-detect-4.1.0.tgz}
@@ -2153,6 +2171,10 @@ snapshots:
 
   fraction.js@4.3.7: {}
 
+  framesync@6.1.2:
+    dependencies:
+      tslib: 2.4.0
+
   fs-minipass@2.1.0:
     dependencies:
       minipass: 3.3.6
@@ -2203,6 +2225,8 @@ snapshots:
       function-bind: 1.1.2
 
   he@1.2.0: {}
+
+  hey-listen@1.0.8: {}
 
   hoofd@1.7.1(react@16.14.0):
     dependencies:
@@ -2404,6 +2428,13 @@ snapshots:
       mlly: 1.7.1
       pathe: 1.1.2
 
+  popmotion@11.0.5:
+    dependencies:
+      framesync: 6.1.2
+      hey-listen: 1.0.8
+      style-value-types: 5.1.2
+      tslib: 2.4.0
+
   postcss-import@15.1.0(postcss@8.4.47):
     dependencies:
       postcss: 8.4.47
@@ -2574,6 +2605,11 @@ snapshots:
 
   strip-final-newline@3.0.0: {}
 
+  style-value-types@5.1.2:
+    dependencies:
+      hey-listen: 1.0.8
+      tslib: 2.4.0
+
   sucrase@3.35.0:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
@@ -2647,6 +2683,8 @@ snapshots:
       regexparam: 3.0.0
 
   ts-interface-checker@0.1.13: {}
+
+  tslib@2.4.0: {}
 
   type-detect@4.1.0: {}
 

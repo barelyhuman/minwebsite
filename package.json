@@ -19,6 +19,7 @@
     "adex": "0.0.18-alpha.6",
     "adex-adapter-node": "0.0.18-alpha.2",
     "date-fns": "^4.1.0",
+    "popmotion": "^11.0.5",
     "preact": "^10.22.1",
     "wade": "^0.3.3"
   },

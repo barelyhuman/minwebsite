@@ -1,4 +1,5 @@
 import { Component } from 'preact'
+import { animate } from 'popmotion'
 
 export class Image extends Component {
   state = {
@@ -16,10 +17,19 @@ export class Image extends Component {
   }
 
   loading(event) {
-    if (event.target.complete)
+    if (event.target.complete) {
+      animate({
+        from: 0,
+        to: 1,
+        duration: 350,
+        onUpdate(v) {
+          event.target.style.opacity = v
+        },
+      })
       this.setState({
         loaded: true,
       })
+    }
   }
 
   componentDidMount() {
@@ -39,8 +49,17 @@ export class Image extends Component {
       .filter(Boolean)
       .concat(loaded ? this.props.classNameOnLoad.split(' ') : [])
       .join(' ')
+
     return (
-      <img className={classList} ref={element => (this.element = element)} />
+      <img
+        className={classList}
+        style={{
+          opacity: 0,
+        }}
+        ref={element => {
+          this.element = element
+        }}
+      />
     )
   }
 }
