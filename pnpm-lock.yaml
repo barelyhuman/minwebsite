@@ -17,9 +17,12 @@ importers:
       '@preact/signals':
         specifier: ^2.0.1
         version: 2.0.1(preact@10.24.2)
+      adex:
+        specifier: 0.0.18-alpha.6
+        version: 0.0.18-alpha.6(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.18-alpha.2)(astring@1.9.0)(preact@10.24.2)(react@16.14.0)
       adex-adapter-node:
-        specifier: ^0.0.17
-        version: 0.0.17
+        specifier: 0.0.18-alpha.2
+        version: 0.0.18-alpha.2
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -39,9 +42,6 @@ importers:
       '@types/node':
         specifier: ^20
         version: 20.16.10
-      adex:
-        specifier: github:barelyhuman/adex#path:adex
-        version: https://codeload.github.com/barelyhuman/adex/tar.gz/cf6e4617c5ddd12abce518d4bd1fe74340a672d3#path:adex(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.17)(astring@1.9.0)(preact@10.24.2)(react@16.14.0)
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.20(postcss@8.4.47)
@@ -534,12 +534,11 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  adex-adapter-node@0.0.17:
-    resolution: {integrity: sha512-AoYh81196oIiA1KqLanJKRGL+4mHptnzx7Ig4tG1NnMz756lZmSZPvSyt0luKtbz7nL53pHtY9euaHqdWDMmNw==, tarball: https://registry.npmjs.org/adex-adapter-node/-/adex-adapter-node-0.0.17.tgz}
+  adex-adapter-node@0.0.18-alpha.2:
+    resolution: {integrity: sha512-UVro+48E7wg0tz8zkdRLqkYHB2hPBnJffjwuTvIClmg1NNQi6/G18/FXGC7lWIZAt4d14e7YXtAdS1puB+ekgg==, tarball: https://registry.npmjs.org/adex-adapter-node/-/adex-adapter-node-0.0.18-alpha.2.tgz}
 
-  adex@https://codeload.github.com/barelyhuman/adex/tar.gz/cf6e4617c5ddd12abce518d4bd1fe74340a672d3#path:adex:
-    resolution: {path: adex, tarball: https://codeload.github.com/barelyhuman/adex/tar.gz/cf6e4617c5ddd12abce518d4bd1fe74340a672d3}
-    version: 0.0.18-alpha.0
+  adex@0.0.18-alpha.6:
+    resolution: {integrity: sha512-8AxkXB0DLmlQSAkcgCFca4tAyyVySZ1AK3VCtcONOPAvocfnkFoPfftNeo6+NvuFg/nxDN+qcINVBEy1PUP3Vw==, tarball: https://registry.npmjs.org/adex/-/adex-0.0.18-alpha.6.tgz}
     peerDependencies:
       '@preact/preset-vite': '>=2.8.2'
       adex-adapter-node: '>=0.0.15'
@@ -1153,6 +1152,12 @@ packages:
   postcss@8.4.47:
     resolution: {integrity: sha512-56rxCq7G/XfB4EkXq9Egn5GCqugWvDFjafDOThIdMBsI15iqPqR5r15TfSr1YPYeEI19YeaXMCbY6u88Y76GLQ==, tarball: https://registry.npmjs.org/postcss/-/postcss-8.4.47.tgz}
     engines: {node: ^10 || ^12 || >=14}
+
+  preact-iso@2.9.1:
+    resolution: {integrity: sha512-65+oY5FHeSC3mjq2Dg6v72HYjsTYTqI9hXl1BK6vtUkxwfCqDJ5aqk33zjOH3aSuCY7duWiulyqMQ53GXpPIIQ==, tarball: https://registry.npmjs.org/preact-iso/-/preact-iso-2.9.1.tgz}
+    peerDependencies:
+      preact: '>=10'
+      preact-render-to-string: '>=6.4.0'
 
   preact-render-to-string@6.5.11:
     resolution: {integrity: sha512-ubnauqoGczeGISiOh6RjX0/cdaF8v/oDXIjO85XALCQjwQP+SB4RDXXtvZ6yTYSjG+PC1QRP2AhPgCEsM2EvUw==, tarball: https://registry.npmjs.org/preact-render-to-string/-/preact-render-to-string-6.5.11.tgz}
@@ -1845,9 +1850,9 @@ snapshots:
 
   acorn@8.12.1: {}
 
-  adex-adapter-node@0.0.17: {}
+  adex-adapter-node@0.0.18-alpha.2: {}
 
-  adex@https://codeload.github.com/barelyhuman/adex/tar.gz/cf6e4617c5ddd12abce518d4bd1fe74340a672d3#path:adex(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.17)(astring@1.9.0)(preact@10.24.2)(react@16.14.0):
+  adex@0.0.18-alpha.6(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.18-alpha.2)(astring@1.9.0)(preact@10.24.2)(react@16.14.0):
     dependencies:
       '@barelyhuman/tiny-use': 0.0.2
       '@dumbjs/preland': 0.0.2(astring@1.9.0)
@@ -1858,13 +1863,14 @@ snapshots:
       mri: 1.2.0
       node-stream-zip: 1.15.0
       preact: 10.24.2
+      preact-iso: 2.9.1(preact-render-to-string@6.5.11(preact@10.24.2))(preact@10.24.2)
       preact-render-to-string: 6.5.11(preact@10.24.2)
       regexparam: 3.0.0
       sirv: 2.0.4
       trouter: 4.0.0
       unifont: 0.0.2
     optionalDependencies:
-      adex-adapter-node: 0.0.17
+      adex-adapter-node: 0.0.18-alpha.2
     transitivePeerDependencies:
       - astring
       - magicast
@@ -2434,6 +2440,11 @@ snapshots:
       nanoid: 3.3.7
       picocolors: 1.1.0
       source-map-js: 1.2.1
+
+  preact-iso@2.9.1(preact-render-to-string@6.5.11(preact@10.24.2))(preact@10.24.2):
+    dependencies:
+      preact: 10.24.2
+      preact-render-to-string: 6.5.11(preact@10.24.2)
 
   preact-render-to-string@6.5.11(preact@10.24.2):
     dependencies:
