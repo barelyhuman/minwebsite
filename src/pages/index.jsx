@@ -11,19 +11,21 @@ import { Image } from '../components/Image'
 let searcher
 
 const sites$ = signal([])
+const searchTerm$ = signal('')
 
 const MIN_CARD_WIDTH = 280
 
 async function getData() {
   const response = await fetch('/api/data').then(d => d.json())
-  searcher = microsearch(response, ['title', 'link'])
-  return response
+  const sortedResponse = response.sort((x, y) => x.title.localeCompare(y.title))
+  searcher = microsearch(sortedResponse, ['title', 'link'])
+  return sortedResponse
 }
 
 if (typeof window != 'undefined') {
   ;(async () => {
     const data = await getData()
-    sites$.value = data.sort((x, y) => x.title.localeCompare(y.title))
+    sites$.value = data
   })()
 }
 
@@ -35,12 +37,20 @@ const recents = computed(() =>
     .slice(0, 4)
 )
 
+const filtered$ = computed(() => {
+  if (searchTerm$.value.length > 0) {
+    const searched = searcher(searchTerm$.value)
+    return searched
+  }
+  return sites$.value
+})
+
 const containerWidth = signal(900)
 const offset = { value: 8 }
 const columns = signal(3)
 
 const bentoPositions = computed(() => {
-  const sites = sites$.value
+  const sites = filtered$.value
   const containerW = containerWidth.value
   const cols = columns.value
   const offsetVal = offset.value
@@ -131,10 +141,23 @@ export default () => {
           })}
         </ul>
       </div>
+      <div>
+        <div class="w-full max-w-xs ml-auto">
+          <input
+            type="text"
+            placeholder="Search"
+            class="flex w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"
+            value={searchTerm$.value}
+            onInput={e => {
+              searchTerm$.value = e.target.value
+            }}
+          />
+        </div>
+      </div>
       <div class="my-24">
         <h2 class="font-semibold">Gallery</h2>
         <div class="relative gap-2 mt-4 w-full">
-          {sites$.value.map((d, ind) => {
+          {filtered$.value.map((d, ind) => {
             const pos = Object.fromEntries(
               Object.entries(bentoPositions.value[ind]).map(d => [
                 d[0],
@@ -144,6 +167,7 @@ export default () => {
             return (
               <div
                 class="inline-flex absolute justify-center items-center hover:cursor-pointer text-zinc-500"
+                key={d.link}
                 style={{
                   ...pos,
                 }}
@@ -199,16 +223,18 @@ function onGridMount() {
 }
 
 function microsearch(collection, paths) {
-  const index = collection.map(d => paths.map(p => get(d, p)))
+  const searchIndex = collection.map(d => paths.map(p => get(d, p)))
   return term => {
-    return index
+    return searchIndex
       .map((d, index) => {
         return [d, index]
       })
-      .filter(val =>
-        val[0].find(t => t.toLowerCase().includes(term.toLowerCase()))
-      )
-      .map(matches => collection[matches[1]])
+      .filter(val => {
+        return val[0].some(t => t.toLowerCase().includes(term.toLowerCase()))
+      })
+      .map(matches => {
+        return collection[matches[1]]
+      })
   }
 }
 
