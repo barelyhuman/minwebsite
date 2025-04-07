@@ -12,7 +12,7 @@ importers:
         specifier: ^0.0.7
         version: 0.0.7
       '@preact/preset-vite':
-        specifier: ^2.9.0
+        specifier: ^2.9.1
         version: 2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10))
       '@preact/signals':
         specifier: ^2.0.1
@@ -30,7 +30,7 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5
       preact:
-        specifier: ^10.22.1
+        specifier: ^10.24.2
         version: 10.24.2
       wade:
         specifier: ^0.3.3
@@ -43,22 +43,22 @@ importers:
         specifier: ^0.5.9
         version: 0.5.9(tailwindcss@3.4.13)
       '@types/node':
-        specifier: ^20
+        specifier: ^20.16.10
         version: 20.16.10
       autoprefixer:
-        specifier: ^10.4.19
+        specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.47)
       postcss:
-        specifier: ^8.4.39
+        specifier: ^8.4.47
         version: 8.4.47
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
       tailwindcss:
-        specifier: ^3.4.5
+        specifier: ^3.4.13
         version: 3.4.13
       vite:
-        specifier: ^5.3.3
+        specifier: ^5.4.8
         version: 5.4.8(@types/node@20.16.10)
 
 packages:
@@ -645,8 +645,8 @@ packages:
     resolution: {integrity: sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA==, tarball: https://registry.npmjs.org/camelcase-css/-/camelcase-css-2.0.1.tgz}
     engines: {node: '>= 6'}
 
-  caniuse-lite@1.0.30001667:
-    resolution: {integrity: sha512-7LTwJjcRkzKFmtqGsibMeuXmvFDfZq/nzIjnmgCGzKKRVzjD72selLDK1oPF/Oxzmt4fNcPvTDvGqSDG4tCALw==, tarball: https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001667.tgz}
+  caniuse-lite@1.0.30001712:
+    resolution: {integrity: sha512-MBqPpGYYdQ7/hfKiet9SCI+nmN5/hp4ZzveOJubl5DTAMa5oggjAuoi0Z4onBpKPFI2ePGnQuQIzF3VxDjDJig==, tarball: https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001712.tgz}
 
   chalk@2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==, tarball: https://registry.npmjs.org/chalk/-/chalk-2.4.2.tgz}
@@ -1924,7 +1924,7 @@ snapshots:
   autoprefixer@10.4.20(postcss@8.4.47):
     dependencies:
       browserslist: 4.24.0
-      caniuse-lite: 1.0.30001667
+      caniuse-lite: 1.0.30001712
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.1.0
@@ -1951,7 +1951,7 @@ snapshots:
 
   browserslist@4.24.0:
     dependencies:
-      caniuse-lite: 1.0.30001667
+      caniuse-lite: 1.0.30001712
       electron-to-chromium: 1.5.32
       node-releases: 2.0.18
       update-browserslist-db: 1.1.1(browserslist@4.24.0)
@@ -1991,7 +1991,7 @@ snapshots:
 
   camelcase-css@2.0.1: {}
 
-  caniuse-lite@1.0.30001667: {}
+  caniuse-lite@1.0.30001712: {}
 
   chalk@2.4.2:
     dependencies:
