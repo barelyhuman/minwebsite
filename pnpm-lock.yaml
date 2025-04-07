@@ -18,11 +18,11 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1(preact@10.24.2)
       adex:
-        specifier: 0.0.18-alpha.6
-        version: 0.0.18-alpha.6(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.18-alpha.2)(astring@1.9.0)(preact@10.24.2)(react@16.14.0)
+        specifier: 0.0.19-alpha.4
+        version: 0.0.19-alpha.4(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.18)(astring@1.9.0)(preact@10.24.2)(react@16.14.0)
       adex-adapter-node:
-        specifier: 0.0.18-alpha.2
-        version: 0.0.18-alpha.2
+        specifier: 0.0.18
+        version: 0.0.18
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -537,11 +537,11 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  adex-adapter-node@0.0.18-alpha.2:
-    resolution: {integrity: sha512-UVro+48E7wg0tz8zkdRLqkYHB2hPBnJffjwuTvIClmg1NNQi6/G18/FXGC7lWIZAt4d14e7YXtAdS1puB+ekgg==, tarball: https://registry.npmjs.org/adex-adapter-node/-/adex-adapter-node-0.0.18-alpha.2.tgz}
+  adex-adapter-node@0.0.18:
+    resolution: {integrity: sha512-oBilomXBonCfKg80PLqVit2MRj1jvaJe3B+Mvq6KKr8nU7Btw8eebp/G2kQ6uVhBC5nivyIj2ydfhBEc1jtqFg==, tarball: https://registry.npmjs.org/adex-adapter-node/-/adex-adapter-node-0.0.18.tgz}
 
-  adex@0.0.18-alpha.6:
-    resolution: {integrity: sha512-8AxkXB0DLmlQSAkcgCFca4tAyyVySZ1AK3VCtcONOPAvocfnkFoPfftNeo6+NvuFg/nxDN+qcINVBEy1PUP3Vw==, tarball: https://registry.npmjs.org/adex/-/adex-0.0.18-alpha.6.tgz}
+  adex@0.0.19-alpha.4:
+    resolution: {integrity: sha512-bG8SDzowzGwMUAlEOgaskrXSreJy8VRStNDcmSrUKmsLRoLG61cX4ceSK1sZj76o6LzQYfiBDvL3dt94QPyW8w==, tarball: https://registry.npmjs.org/adex/-/adex-0.0.19-alpha.4.tgz}
     peerDependencies:
       '@preact/preset-vite': '>=2.8.2'
       adex-adapter-node: '>=0.0.15'
@@ -1868,9 +1868,9 @@ snapshots:
 
   acorn@8.12.1: {}
 
-  adex-adapter-node@0.0.18-alpha.2: {}
+  adex-adapter-node@0.0.18: {}
 
-  adex@0.0.18-alpha.6(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.18-alpha.2)(astring@1.9.0)(preact@10.24.2)(react@16.14.0):
+  adex@0.0.19-alpha.4(@preact/preset-vite@2.9.1(@babel/core@7.25.7)(preact@10.24.2)(vite@5.4.8(@types/node@20.16.10)))(adex-adapter-node@0.0.18)(astring@1.9.0)(preact@10.24.2)(react@16.14.0):
     dependencies:
       '@barelyhuman/tiny-use': 0.0.2
       '@dumbjs/preland': 0.0.2(astring@1.9.0)
@@ -1888,7 +1888,7 @@ snapshots:
       trouter: 4.0.0
       unifont: 0.0.2
     optionalDependencies:
-      adex-adapter-node: 0.0.18-alpha.2
+      adex-adapter-node: 0.0.18
     transitivePeerDependencies:
       - astring
       - magicast
