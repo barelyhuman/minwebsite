@@ -5,9 +5,10 @@ export default async (req: ClientRequest, res: ServerResponse) => {
     'https://ungh.cc/repos/barelyhuman/minweb-public-data/files/main/data/links.json'
   ).then(d => d.json())
 
+
   let data = []
   try {
-    data = JSON.parse(response.file.contents)
+    data = response
   } catch (err) {
     console.error('Failed to get data')
   }
